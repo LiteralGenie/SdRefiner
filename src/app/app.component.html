@@ -1,0 +1,17 @@
+<mat-drawer-container autosize [style.height.%]="100">
+    <mat-drawer #drawer mode="side" opened>
+        <mat-tab-group mat-align-tabs="start">
+            <mat-tab label="SETTINGS">
+                <app-grid-settings></app-grid-settings>
+            </mat-tab>
+            <mat-tab label="FAVORITES">Content 2</mat-tab>
+            <mat-tab label="HISTORY">Content 3</mat-tab>
+        </mat-tab-group>
+    </mat-drawer>
+
+    <mat-drawer-content>
+        <mat-toolbar>
+            <button (click)="drawer.toggle()" mat-button>DRAWER</button>
+        </mat-toolbar>
+    </mat-drawer-content>
+</mat-drawer-container>
