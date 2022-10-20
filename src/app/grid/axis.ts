@@ -92,16 +92,16 @@ export const AXIS_SIZE = {
     },
 } as const satisfies AxisInterface<[number, number]>
 
-const AXES = [
-    AXIS_PROMPT,
-    AXIS_PROMPT_NEGATIVE,
-    AXIS_STEPS,
-    AXIS_SAMPLER,
-    AXIS_CFG_SCALE,
-    AXIS_SEED,
-    AXIS_SIZE,
-] as const
+export const AXES = {
+    prompt: AXIS_PROMPT,
+    prompt_negative: AXIS_PROMPT_NEGATIVE,
+    steps: AXIS_STEPS,
+    sampler: AXIS_SAMPLER,
+    cfg: AXIS_CFG_SCALE,
+    seed: AXIS_SEED,
+    size: AXIS_SIZE,
+} as const;
 
-export type Axis = typeof AXES[number]
-export type AxisName = typeof AXES[number]['name']
-export type AxisId = typeof AXES[number]['id']
+export type AxisId = keyof typeof AXES;
+export type Axis = typeof AXES[AxisId]
+export type AxisName = Axis['name']

@@ -1,0 +1,153 @@
+<div
+    style="
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) max-content;
+        height: 100%;
+    "
+>
+    <div style="min-height: 0; overflow: auto">
+        <form
+            *ngIf="loaded"
+            [formGroup]="gridForm"
+            style="display: flex; flex-flow: column"
+        >
+            <ng-container formGroupName="baseParams">
+                <mat-form-field appearance="outline">
+                    <mat-label>Prompt</mat-label>
+                    <textarea
+                        matInput
+                        cdkTextareaAutosize
+                        formControlName="prompt"
+                    ></textarea>
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                    <mat-label for="prompt_negative">Negative Prompt</mat-label>
+                    <textarea
+                        matInput
+                        cdkTextareaAutosize
+                        formControlName="prompt_negative"
+                    ></textarea>
+                </mat-form-field>
+                <div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Sampler</mat-label>
+                        <mat-select formControlName="sampler">
+                            <mat-option
+                                *ngFor="let smplr of ['Euler', 'Euler a']"
+                                [value]="smplr"
+                            >
+                                {{ smplr }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Steps</mat-label>
+                        <input formControlName="steps" matInput type="number" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>CFG Scale</mat-label>
+                        <input
+                            formControlName="cfg_scale"
+                            matInput
+                            type="number"
+                        />
+                    </mat-form-field>
+                </div>
+                <div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Height</mat-label>
+                        <input formControlName="width" matInput type="number" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Width</mat-label>
+                        <input
+                            formControlName="height"
+                            matInput
+                            type="number"
+                        />
+                    </mat-form-field>
+                </div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Seed</mat-label>
+                    <input formControlName="seed" matInput type="number" />
+                </mat-form-field>
+            </ng-container>
+            <mat-divider></mat-divider>
+            <ng-container formGroupName="axisOptions">
+                <div style="display: flex; flex-flow: row">
+                    <div
+                        (cdkDropListDropped)="drop($event)"
+                        *ngLet="gridForm.controls['xAxis'].value as xAxis"
+                        [formArrayName]="xAxis"
+                        cdkDropList
+                        style="display: flex; flex-flow: column"
+                    >
+                        <span>X - {{ xAxis }}</span>
+                        <div
+                            *ngFor="
+                                let x of $any(
+                                    $any(gridForm.controls.axisOptions)
+                                        .controls[xAxis].controls
+                                );
+                                let i = index
+                            "
+                            cdkDrag
+                            style="display: flex; flex-flow: row"
+                        >
+                            <mat-form-field appearance="outline">
+                                <mat-label>{{ x.value }}</mat-label>
+                                <input
+                                    matInput
+                                    type="number"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <div cdkDragHandle>DRAG</div>
+                            <div cdkDragHandle>ADD</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; flex-flow: row">
+                    <div
+                        (cdkDropListDropped)="drop($event)"
+                        *ngLet="gridForm.controls['yAxis'].value as yAxis"
+                        [formArrayName]="yAxis"
+                        cdkDropList
+                        style="display: flex; flex-flow: column"
+                    >
+                        <span>Y - {{ yAxis }}</span>
+                        <div
+                            *ngFor="
+                                let y of $any(
+                                    $any(gridForm.controls.axisOptions)
+                                        .controls[yAxis].controls
+                                );
+                                let i = index
+                            "
+                            cdkDrag
+                            style="display: flex; flex-flow: row"
+                        >
+                            <mat-form-field appearance="outline">
+                                <mat-label>{{ y.value }}</mat-label>
+                                <input
+                                    matInput
+                                    type="number"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <div cdkDragHandle>DRAG</div>
+                            <div cdkDragHandle>ADD</div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </form>
+    </div>
+
+    <mat-toolbar>
+        <button [disabled]="!activeGrid" (click)="reset()" mat-button>
+            Reset
+        </button>
+        <button (click)="save()" mat-button>Save</button>
+    </mat-toolbar>
+</div>

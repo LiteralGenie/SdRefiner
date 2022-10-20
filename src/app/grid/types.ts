@@ -1,4 +1,4 @@
-import { AxisId, AxisInterface, AxisName } from './axis'
+import { AxisId, AxisInterface } from './axis'
 
 export interface Grid<X = any, Y = any> {
     baseParams: ImageParams
@@ -11,6 +11,10 @@ export interface Grid<X = any, Y = any> {
 export type GridForm = {
     baseParams: ImageParams
     axisOptions: typeof DEFAULT_AXIS_OPTIONS
+    activeAxis: {
+        x: AxisId
+        y: AxisId
+    }
 }
 
 export const DEFAULT_AXIS_OPTIONS = {

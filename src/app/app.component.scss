@@ -1,0 +1,11 @@
+app-root {
+    & > .mat-drawer-container {
+        .mat-drawer,
+        .mat-tab-group,
+        .mat-tab-body-wrapper,
+        .mat-tab-body,
+        app-grid-settings {
+            height: 100%;
+        }
+    }
+}
