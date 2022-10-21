@@ -12,14 +12,16 @@ export class DataService {
 
     public async getImage(request: ImageParams): Promise<string> {
         const url = API_URL + '/generate'
-        return firstValueFrom(this.http.post<string>(url, request))
+        return await firstValueFrom(
+            this.http.post<string>(url, { parameters: request })
+        )
     }
 
     public async getImageCached(
         imageParams: ImageParams
     ): Promise<string | null> {
         const url = API_URL + '/generate'
-        return firstValueFrom(
+        return await firstValueFrom(
             this.http.post<string | null>(url, {
                 parameters: imageParams,
                 onlyCache: true,

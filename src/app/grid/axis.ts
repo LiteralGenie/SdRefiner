@@ -11,8 +11,10 @@ export const AXIS_PROMPT = {
     id: 'prompt',
     name: 'Prompt',
     mapParams: (params, value) => {
-        params.prompt = value + params.prompt
-        return params
+        return {
+            ...params,
+            prompt: value + params.prompt
+        }
     },
     mapDisplay: (params, value) => {
         return value
@@ -23,8 +25,10 @@ export const AXIS_PROMPT_NEGATIVE = {
     id: 'prompt_negative',
     name: 'Negative Prompt',
     mapParams: (params, value) => {
-        params.prompt_negative = value + params.prompt_negative
-        return params
+        return {
+            ...params,
+            prompt_negative: value + params.prompt_negative
+        }
     },
     mapDisplay: (params, value) => {
         return value
@@ -35,8 +39,10 @@ export const AXIS_STEPS = {
     id: 'steps',
     name: 'Steps',
     mapParams: (params, value) => {
-        params.steps = value
-        return params
+        return {
+            ...params,
+            steps: value   
+        }
     },
     mapDisplay: (params, value) => {
         return value.toString()
@@ -47,8 +53,10 @@ export const AXIS_SAMPLER = {
     id: 'sampler',
     name: 'Sampler',
     mapParams: (params, value) => {
-        params.sampler = value
-        return params
+        return {
+            ...params,
+            sampler: value   
+        }
     },
     mapDisplay: (params, value) => {
         return value
@@ -59,8 +67,10 @@ export const AXIS_CFG_SCALE= {
     id: 'cfg',
     name: 'CFG',
     mapParams: (params, value) => {
-        params.cfg_scale = value
-        return params
+        return {
+            ...params,
+            cfg_scale: value   
+        }
     },
     mapDisplay: (params, value) => {
         return value.toString()
@@ -71,8 +81,10 @@ export const AXIS_SEED = {
     id: 'seed',
     name: 'Seed',
     mapParams: (params, value) => {
-        params.seed = value
-        return params
+        return {
+            ...params,
+            seed: value   
+        }
     },
     mapDisplay: (params, value) => {
         return value.toString()
@@ -83,9 +95,11 @@ export const AXIS_SIZE = {
     id: 'size',
     name: 'Size',
     mapParams: (params, value) => {
-        params.width = value[0]
-        params.height = value[1]
-        return params
+        return {
+            ...params,
+            width: value[0],
+            height: value[1]   
+        }
     },
     mapDisplay: (params, value) => {
         return `${value[0]}x${value[1]}`

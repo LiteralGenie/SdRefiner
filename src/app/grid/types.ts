@@ -1,5 +1,17 @@
 import { AxisId, AxisInterface } from './axis'
 
+/**
+ * @todo
+ * {
+ *   baseParams,
+ *   axes: {
+ *     xId,
+ *     xValues,
+ *     yId,
+ *     yValues
+ *   }
+ * }
+ */
 export interface Grid<X = any, Y = any> {
     baseParams: ImageParams
     xAxis: AxisInterface<X>
@@ -35,7 +47,7 @@ export const DEFAULT_AXIS_OPTIONS = {
 export const DEFAULT_PARAMS: ImageParams = {
     prompt: '',
     prompt_negative: '',
-    steps: 1,
+    steps: 20,
     sampler: 'Euler a',
     cfg_scale: 7,
     seed: -1,

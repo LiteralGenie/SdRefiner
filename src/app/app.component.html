@@ -9,9 +9,16 @@
         </mat-tab-group>
     </mat-drawer>
 
-    <mat-drawer-content>
+    <mat-drawer-content style="display: flex; flex-flow: column">
         <mat-toolbar>
             <button (click)="drawer.toggle()" mat-button>DRAWER</button>
+        </mat-toolbar>
+        <div style="overflow: auto">
+            <app-grid-view></app-grid-view>
+        </div>
+        <mat-toolbar>
+            <button (click)="drawer.toggle()" mat-button>MINUS</button>
+            <button (click)="drawer.toggle()" mat-button>PLUS</button>
         </mat-toolbar>
     </mat-drawer-content>
 </mat-drawer-container>

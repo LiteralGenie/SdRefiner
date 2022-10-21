@@ -1,5 +1,5 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop'
-import { Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { Store } from '@ngrx/store'
 import { EMPTY, Subscription, tap } from 'rxjs'
@@ -16,6 +16,7 @@ import { Grid } from '../types'
     selector: 'app-grid-settings',
     templateUrl: './grid-settings.component.html',
     styleUrls: ['./grid-settings.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridSettingsComponent {
     loaded = false
@@ -40,7 +41,9 @@ export class GridSettingsComponent {
         axisOptions: new FormGroup({} as any),
     })
 
-    constructor(private store: Store) {
+    constructor(private store: Store) {}
+
+    ngOnInit() {
         this.subGridForm = this.store
             .select(selectGridForm)
             .pipe(
@@ -152,4 +155,8 @@ export class GridSettingsComponent {
     }
 
     drop(event: CdkDragDrop<number[]>) {}
+
+    ngAfterViewInit() {
+        this.save()
+    }
 }

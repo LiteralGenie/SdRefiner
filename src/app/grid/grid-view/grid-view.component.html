@@ -1,1 +1,33 @@
-<p>grid-view works!</p>
+<div
+    style="
+        display: grid;
+        height: 100%;
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: max-content 1fr;
+    "
+>
+    <!-- Top-left corner -->
+    <div></div>
+
+    <!-- Column titles -->
+    <div></div>
+
+    <!-- Row Titles -->
+    <div></div>
+
+    <!-- Images -->
+    <div style="min-height: 0; min-width: 0">
+        <div
+            *ngIf="images.length > 0"
+            [style.display]="'grid'"
+            [style.grid-template-rows]="rowHeights"
+            [style.grid-template-columns]="colWidths"
+        >
+            <ng-container *ngFor="let row of images">
+                <ng-container *ngFor="let img of row">
+                    <app-grid-image [img]="img"></app-grid-image>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</div>

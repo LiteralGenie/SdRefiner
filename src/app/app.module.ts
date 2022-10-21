@@ -23,10 +23,11 @@ import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { GridSettingsComponent } from './grid/grid-settings/grid-settings.component'
 import { GridViewComponent } from './grid/grid-view/grid-view.component'
-import { gridFormReducer, gridReducer } from './grid/store'
+import { gridFormReducer, gridReducer } from './grid/store';
+import { GridImageComponent } from './grid/grid-image/grid-image.component'
 
 @NgModule({
-    declarations: [AppComponent, GridSettingsComponent, GridViewComponent],
+    declarations: [AppComponent, GridSettingsComponent, GridViewComponent, GridImageComponent],
     imports: [
         StoreModule.forRoot({ grid: gridReducer, gridForm: gridFormReducer }),
         BrowserModule,
