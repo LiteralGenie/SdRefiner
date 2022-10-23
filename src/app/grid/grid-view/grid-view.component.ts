@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { Store } from '@ngrx/store'
 import * as d3 from 'd3'
-import { filter, map, Observable, share, tap } from 'rxjs'
+import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
 import { DataService } from 'src/app/services/data.service'
 import { selectGrid } from '../store'
 import { Grid, ImageParams } from '../types'
@@ -12,7 +12,7 @@ import { Grid, ImageParams } from '../types'
     styleUrls: ['./grid-view.component.scss'],
 })
 export class GridViewComponent {
-    grid$ = this.store.select(selectGrid).pipe(
+    private grid$ = this.store.select(selectGrid).pipe(
         filter((grid) => !!grid),
         share()
     )
@@ -63,7 +63,6 @@ export class GridViewComponent {
             }
         }),
         tap(async (grid) => {
-            console.log(grid.images)
             // Load cached images
             grid.images.forEach((row) => {
                 row.forEach((cell) => {
@@ -78,7 +77,7 @@ export class GridViewComponent {
                 }
             }
         }),
-        share()
+        shareReplay(1)
     )
 
     @ViewChild('containerEl') containerEl!: ElementRef<Element>
@@ -89,23 +88,19 @@ export class GridViewComponent {
     }
 
     ngAfterViewInit() {
-        const el = this.containerEl.nativeElement
-        const container = d3.select(el)
-        const images = d3.select(el.children[3])
-        const yAxis = d3.select(el.children[2])
-        const xAxis = d3.select(el.children[1])
+        const containerEl = this.containerEl.nativeElement
+        const imGrid = d3
+            .select(containerEl)
+            .selectChild('svg')
+            .selectChild('g')
+        const yAxis = d3.select(containerEl.children[2])
+        const xAxis = d3.select(containerEl.children[1])
 
-        const dragBehavior = d3.drag()
-        const zoomBehavior = d3.zoom()
-        container.call(zoomBehavior).datum({})
+        const zoomBehavior = d3.zoom().interpolate(d3.interpolate)
+        d3.select(this.containerEl.nativeElement).call(zoomBehavior)
 
-        zoomBehavior.on('zoom', ({ sourceEvent, transform: tfm }) => {
-            images
-                .style(
-                    'transform',
-                    `translate(${tfm.x}px, ${tfm.y}px) scale(${tfm.k})`
-                )
-                .style('transform-origin', '0 0')
+        zoomBehavior.on('zoom', ({ transform: tfm }) => {
+            imGrid.attr('transform', tfm.toString())
 
             yAxis
                 .style('transform', `translate(0, ${tfm.y}px)`)
@@ -116,6 +111,54 @@ export class GridViewComponent {
                 .style('transform-origin', '0 0')
 
             this.scale = tfm.k
+        })
+
+        zoomBehavior.on('end', ({ sourceEvent, transform: tfm }) => {
+            this.gridView$.subscribe((gridView) => {
+                if (!sourceEvent) return
+
+                const gridHeight = gridView.rows.reduce(
+                    (total, track) => total + track.dim,
+                    0
+                )
+                const gridWidth = gridView.cols.reduce(
+                    (total, track) => total + track.dim,
+                    0
+                )
+
+                const vpHeight = containerEl.clientHeight
+                const vpWidth = containerEl.clientWidth
+
+                const realSize = { x: gridWidth * tfm.k, y: gridHeight * tfm.k }
+
+                const minX = -realSize.x * 0.8
+                const maxX = vpWidth * 0.8
+                const minY = -realSize.y * 0.8
+                const maxY = vpHeight * 0.8
+
+                const { x, y } = tfm
+
+                let tgtX, tgtY
+                if (x < minX) tgtX = minX
+                else if (x > maxX) tgtX = maxX
+                if (y < minY) tgtY = minY
+                else if (y > maxY) tgtY = maxY
+
+                if (tgtX !== undefined || tgtY !== undefined) {
+                    d3.select(containerEl)
+                        .transition()
+                        .duration(750)
+                        .call(
+                            zoomBehavior.transform,
+                            d3.zoomIdentity
+                                .scale(tfm.k)
+                                .translate(
+                                    (tgtX || x) / tfm.k,
+                                    (tgtY || y) / tfm.k
+                                )
+                        )
+                }
+            })
         })
     }
 

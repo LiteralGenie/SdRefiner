@@ -5,16 +5,17 @@
         height: 100%;
         grid-template-rows: max-content 1fr;
         grid-template-columns: max-content 1fr;
+        overflow: hidden;
     "
 >
     <!-- Top-left corner -->
     <div></div>
 
     <!-- Column titles -->
-    <div [style.overflow]="'visible'" [style.z-index]="-1">
-        <div *ngIf="gridView$ | async as grid" [style.display]="'flex'">
+    <div [style.overflow]="'visible'" [style.z-index]="1">
+        <div *ngIf="gridView$ | async as gridView" [style.display]="'flex'">
             <div
-                *ngFor="let col of grid.cols"
+                *ngFor="let col of gridView.cols"
                 [style.width.px]="col.dim * scale"
             >
                 {{ col.title }}
@@ -23,10 +24,10 @@
     </div>
 
     <!-- Row Titles -->
-    <div [style.overflow]="'visible'" [style.z-index]="-1">
-        <div *ngIf="gridView$ | async as grid">
+    <div [style.overflow]="'visible'" [style.z-index]="1">
+        <div *ngIf="gridView$ | async as gridView">
             <div
-                *ngFor="let row of grid.rows"
+                *ngFor="let row of gridView.rows"
                 [style.height.px]="row.dim * scale"
             >
                 {{ row.title }}
@@ -38,20 +39,21 @@
     <svg
         style="min-height: 0; min-width: 0"
         [style.overflow]="'visible'"
-        [style.z-index]="-1"
         #imageGrid
     >
-        <g *ngIf="gridView$ | async as grid">
-            <g *ngFor="let row of grid.rows; index as r">
-                <g *ngFor="let col of grid.cols; index as c">
-                    <image
-                        *ngLet="grid.cellAt(r, c) as cell"
-                        [attr.height]="cell.height"
-                        [attr.width]="cell.width"
-                        [attr.x]="cell.x"
-                        [attr.y]="cell.y"
-                        [attr.href]="cell.image.data"
-                    />
+        <g>
+            <g *ngIf="gridView$ | async as gridView">
+                <g *ngFor="let row of gridView.rows; index as r">
+                    <g *ngFor="let col of gridView.cols; index as c">
+                        <image
+                            *ngLet="gridView.cellAt(r, c) as cell"
+                            [attr.height]="cell.height"
+                            [attr.width]="cell.width"
+                            [attr.x]="cell.x"
+                            [attr.y]="cell.y"
+                            [attr.href]="cell.image.data"
+                        />
+                    </g>
                 </g>
             </g>
         </g>
