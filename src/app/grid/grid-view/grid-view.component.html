@@ -13,7 +13,10 @@
     <!-- Column titles -->
     <div [style.overflow]="'visible'" [style.z-index]="-1">
         <div *ngIf="gridView$ | async as grid" [style.display]="'flex'">
-            <div *ngFor="let col of grid.cols" [style.width.px]="col.dim">
+            <div
+                *ngFor="let col of grid.cols"
+                [style.width.px]="col.dim * scale"
+            >
                 {{ col.title }}
             </div>
         </div>
@@ -22,7 +25,10 @@
     <!-- Row Titles -->
     <div [style.overflow]="'visible'" [style.z-index]="-1">
         <div *ngIf="gridView$ | async as grid">
-            <div *ngFor="let row of grid.rows" [style.height.px]="row.dim">
+            <div
+                *ngFor="let row of grid.rows"
+                [style.height.px]="row.dim * scale"
+            >
                 {{ row.title }}
             </div>
         </div>

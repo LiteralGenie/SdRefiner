@@ -120,7 +120,6 @@ export class GridViewComponent {
     }
 
     private loadGrid(grid: Grid): GridImage[][] {
-        // Define image params
         const images: GridImage[][] = []
         const { baseParams, xAxis, xValues, yAxis, yValues } = grid
 
