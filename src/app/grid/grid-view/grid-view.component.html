@@ -11,25 +11,21 @@
     <div></div>
 
     <!-- Column titles -->
-    <div [style.overflow]="'visible'">
-        <!-- <div
-            *ngIf="images.length > 0"
-            [style.display]="'grid'"
-            [style.grid-template-columns]="colWidths(scale)"
-        >
-            <span *ngFor="let title of colTitles$ | async">{{ title }}</span>
-        </div> -->
+    <div [style.overflow]="'visible'" [style.z-index]="-1">
+        <div *ngIf="gridView$ | async as grid" [style.display]="'flex'">
+            <div *ngFor="let col of grid.cols" [style.width.px]="col.dim">
+                {{ col.title }}
+            </div>
+        </div>
     </div>
 
     <!-- Row Titles -->
-    <div [style.overflow]="'visible'">
-        <!-- <div
-            *ngIf="images.length > 0"
-            [style.display]="'grid'"
-            [style.grid-template-rows]="rowHeights(scale)"
-        >
-            <span *ngFor="let title of rowTitles$ | async">{{ title }}</span>
-        </div> -->
+    <div [style.overflow]="'visible'" [style.z-index]="-1">
+        <div *ngIf="gridView$ | async as grid">
+            <div *ngFor="let row of grid.rows" [style.height.px]="row.dim">
+                {{ row.title }}
+            </div>
+        </div>
     </div>
 
     <!-- Images -->
@@ -39,15 +35,16 @@
         [style.z-index]="-1"
         #imageGrid
     >
-        <g *ngIf="tracks$ | async as tracks">
-            <g *ngFor="let row of tracks[2]; index as r">
-                <g *ngFor="let img of row; index as c">
+        <g *ngIf="gridView$ | async as grid">
+            <g *ngFor="let row of grid.rows; index as r">
+                <g *ngFor="let col of grid.cols; index as c">
                     <image
-                        [attr.height]="tracks[0][r].dim"
-                        [attr.width]="tracks[1][c].dim"
-                        [attr.x]="tracks[0][r].pos(c)"
-                        [attr.y]="tracks[1][c].pos(r)"
-                        [attr.href]="img.data"
+                        *ngLet="grid.cellAt(r, c) as cell"
+                        [attr.height]="cell.height"
+                        [attr.width]="cell.width"
+                        [attr.x]="cell.x"
+                        [attr.y]="cell.y"
+                        [attr.href]="cell.image.data"
                     />
                 </g>
             </g>

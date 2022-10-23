@@ -1,15 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core'
 import { Store } from '@ngrx/store'
 import * as d3 from 'd3'
-import {
-    filter,
-    map,
-    Observable,
-    ReplaySubject,
-    share,
-    tap,
-    withLatestFrom,
-} from 'rxjs'
+import { filter, map, Observable, share, tap } from 'rxjs'
 import { DataService } from 'src/app/services/data.service'
 import { selectGrid } from '../store'
 import { Grid, ImageParams } from '../types'
@@ -24,11 +16,11 @@ export class GridViewComponent {
         filter((grid) => !!grid),
         share()
     )
-    images$ = new ReplaySubject<GridImage[][]>(1)
 
-    tracks$: Observable<[Track[], Track[], GridImage[][]]> = this.images$.pipe(
-        withLatestFrom(this.grid$),
-        map(([images, grid]) => {
+    gridView$: Observable<GridView> = this.grid$.pipe(
+        map((grid) => {
+            const images = this.loadGrid(grid)
+
             // Dims
             const rowHeights = images
                 .map((_, i) => maxHeight(i, images))
@@ -48,27 +40,13 @@ export class GridViewComponent {
 
             // Tracks
             const rowTracks = images.map((_, i) => {
-                return new Track(
-                    rowHeights[i],
-                    colWidths,
-                    rowTitles[i],
-                    colTitles
-                )
+                return new Track(rowHeights[i], rowTitles[i])
             })
             const colTracks = images[0].map((_, i) => {
-                return new Track(
-                    colWidths[i],
-                    rowHeights,
-                    colTitles[i],
-                    rowTitles
-                )
+                return new Track(colWidths[i], colTitles[i])
             })
 
-            return [rowTracks, colTracks, images] as [
-                Track[],
-                Track[],
-                GridImage[][]
-            ]
+            return new GridView(rowTracks, colTracks, images)
 
             function maxHeight(row: number, images: GridImage[][]): number {
                 return Math.max(
@@ -84,6 +62,22 @@ export class GridViewComponent {
                 )
             }
         }),
+        tap(async (grid) => {
+            console.log(grid.images)
+            // Load cached images
+            grid.images.forEach((row) => {
+                row.forEach((cell) => {
+                    cell.loadCached()
+                })
+            })
+
+            // Generate the rest
+            for (let row of grid.images) {
+                for (let cell of row) {
+                    await cell.load()
+                }
+            }
+        }),
         share()
     )
 
@@ -92,9 +86,6 @@ export class GridViewComponent {
 
     ngOnInit() {
         this.grid$.subscribe(this.loadGrid.bind(this))
-        // this.images$.subscribe((x) => console.log('images', x))
-        // this.tracks$.subscribe((x) => console.log('tracks', x))
-        // this.rows$.subscribe((x) => console.log('rows', x))
     }
 
     ngAfterViewInit() {
@@ -109,36 +100,26 @@ export class GridViewComponent {
         container.call(zoomBehavior).datum({})
 
         zoomBehavior.on('zoom', ({ sourceEvent, transform: tfm }) => {
-            images.style(
-                'transform',
-                `translate(${tfm.x}px, ${tfm.y}px) scale(${tfm.k})`
-            )
-            //     .style('transform-origin', '0 0')
+            images
+                .style(
+                    'transform',
+                    `translate(${tfm.x}px, ${tfm.y}px) scale(${tfm.k})`
+                )
+                .style('transform-origin', '0 0')
 
-            // yAxis
-            //     .style('transform', `translate(0, ${tfm.y}px)`)
-            //     .style('transform-origin', '0 0')
+            yAxis
+                .style('transform', `translate(0, ${tfm.y}px)`)
+                .style('transform-origin', '0 0')
 
-            // xAxis
-            //     .style('transform', `translate(${tfm.x}px, 0)`)
-            //     .style('transform-origin', '0 0')
+            xAxis
+                .style('transform', `translate(${tfm.x}px, 0)`)
+                .style('transform-origin', '0 0')
 
             this.scale = tfm.k
         })
-
-        // dragBehavior.on('start', (ev, d: any) => {
-        //     d.start = { x: ev.x, y: ev.y }
-        //     d.scrollStart = { x: cell.scrollLeft, y: cell.scrollTop }
-        // })
-
-        // dragBehavior.on('drag', (ev, d: any) => {
-        //     console.log(ev, d)
-        //     cell.scrollTop = d.scrollStart.y - (ev.y - d.start.y)
-        //     cell.scrollLeft = d.scrollStart.x - (ev.x - d.start.x)
-        // })
     }
 
-    private async loadGrid(grid: Grid) {
+    private loadGrid(grid: Grid): GridImage[][] {
         // Define image params
         const images: GridImage[][] = []
         const { baseParams, xAxis, xValues, yAxis, yValues } = grid
@@ -155,41 +136,43 @@ export class GridViewComponent {
             images.push(row)
         })
 
-        // Load images
-        images.forEach((row) => {
-            row.forEach((cell) => {
-                cell.loadCached()
-            })
-        })
-        for (let row of images) {
-            for (let cell of row) {
-                await cell.load()
-            }
-        }
-
-        this.images$.next(images)
+        return images
     }
 
     constructor(private store: Store, private ds: DataService) {}
 }
 
-class Track {
+class GridView {
     constructor(
-        public dim: number,
-        public scDims: number[],
-        public title: string,
-        public scTitles: string[]
-    ) {
-        const arrs = [scDims, scTitles]
-        if (arrs.slice(1).some((lst) => lst.length !== arrs[0].length))
-            throw Error('Secondary values have different lengths')
-    }
+        public rows: Track[],
+        public cols: Track[],
+        public images: GridImage[][]
+    ) {}
 
-    pos(index: number): number {
-        return this.scDims
-            .slice(0, index)
+    cellAt(row: number, col: number) {
+        const rowTrk = this.rows[row]
+        const colTrk = this.cols[col]
+        const x = this.cols
+            .slice(0, col)
+            .map((trk) => trk.dim)
             .reduce((total, val) => total + val, 0)
+        const y = this.rows
+            .slice(0, row)
+            .map((trk) => trk.dim)
+            .reduce((total, val) => total + val, 0)
+
+        return {
+            height: rowTrk.dim,
+            width: colTrk.dim,
+            x: x,
+            y: y,
+            image: this.images[row][col],
+        }
     }
+}
+
+class Track {
+    constructor(public dim: number, public title: string) {}
 }
 
 class GridImage {
