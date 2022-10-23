@@ -1,4 +1,5 @@
 <div
+    #containerEl
     style="
         display: grid;
         height: 100%;
@@ -10,24 +11,46 @@
     <div></div>
 
     <!-- Column titles -->
-    <div></div>
-
-    <!-- Row Titles -->
-    <div></div>
-
-    <!-- Images -->
-    <div style="min-height: 0; min-width: 0">
-        <div
+    <div [style.overflow]="'visible'">
+        <!-- <div
             *ngIf="images.length > 0"
             [style.display]="'grid'"
-            [style.grid-template-rows]="rowHeights"
-            [style.grid-template-columns]="colWidths"
+            [style.grid-template-columns]="colWidths(scale)"
         >
-            <ng-container *ngFor="let row of images">
-                <ng-container *ngFor="let img of row">
-                    <app-grid-image [img]="img"></app-grid-image>
-                </ng-container>
-            </ng-container>
-        </div>
+            <span *ngFor="let title of colTitles$ | async">{{ title }}</span>
+        </div> -->
     </div>
+
+    <!-- Row Titles -->
+    <div [style.overflow]="'visible'">
+        <!-- <div
+            *ngIf="images.length > 0"
+            [style.display]="'grid'"
+            [style.grid-template-rows]="rowHeights(scale)"
+        >
+            <span *ngFor="let title of rowTitles$ | async">{{ title }}</span>
+        </div> -->
+    </div>
+
+    <!-- Images -->
+    <svg
+        style="min-height: 0; min-width: 0"
+        [style.overflow]="'visible'"
+        [style.z-index]="-1"
+        #imageGrid
+    >
+        <g *ngIf="tracks$ | async as tracks">
+            <g *ngFor="let row of tracks[2]; index as r">
+                <g *ngFor="let img of row; index as c">
+                    <image
+                        [attr.height]="tracks[0][r].dim"
+                        [attr.width]="tracks[1][c].dim"
+                        [attr.x]="tracks[0][r].pos(c)"
+                        [attr.y]="tracks[1][c].pos(r)"
+                        [attr.href]="img.data"
+                    />
+                </g>
+            </g>
+        </g>
+    </svg>
 </div>

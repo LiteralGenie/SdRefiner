@@ -72,75 +72,114 @@
                     <input formControlName="seed" matInput type="number" />
                 </mat-form-field>
             </ng-container>
+
             <mat-divider></mat-divider>
-            <ng-container formGroupName="axisOptions">
-                <div style="display: flex; flex-flow: row">
-                    <div
-                        (cdkDropListDropped)="drop($event)"
-                        *ngLet="gridForm.controls['xAxis'].value as xAxis"
-                        [formArrayName]="xAxis"
-                        cdkDropList
-                        style="display: flex; flex-flow: column"
-                    >
-                        <span>X-Axis</span>
-                        <div
+
+            <div style="display: flex; flex-flow: row">
+                <div
+                    (cdkDropListDropped)="drop($event)"
+                    *ngLet="gridForm.controls['xAxis'].value as xAxis"
+                    cdkDropList
+                    style="display: flex; flex-flow: column"
+                >
+                    <!-- input title -->
+                    <span>X-Axis</span>
+
+                    <!-- axis type -->
+                    <mat-select formControlName="xAxis">
+                        <mat-option
                             *ngFor="
-                                let x of $any(
-                                    $any(gridForm.controls.axisOptions)
-                                        .controls[xAxis].controls
-                                );
-                                let i = index
+                                let opt of gridForm.controls['axisOptions']
+                                    .controls | keyvalue
                             "
-                            cdkDrag
-                            style="display: flex; flex-flow: row"
+                            [value]="$any(AXES)[opt.key].id"
                         >
-                            <mat-form-field appearance="outline">
-                                <mat-label>{{ x.value }}</mat-label>
-                                <input
-                                    matInput
-                                    type="number"
-                                    [formControlName]="i"
-                                />
-                            </mat-form-field>
-                            <div cdkDragHandle>DRAG</div>
-                            <div cdkDragHandle>ADD</div>
-                        </div>
-                    </div>
+                            {{ $any(AXES)[opt.key].name }}
+                        </mat-option>
+                    </mat-select>
+
+                    <!-- axis values -->
+                    <ng-container formGroupName="axisOptions">
+                        <ng-container [formArrayName]="xAxis">
+                            <div
+                                *ngFor="
+                                    let x of $any(
+                                        $any(gridForm.controls.axisOptions)
+                                            .controls[xAxis].controls
+                                    );
+                                    let i = index
+                                "
+                                cdkDrag
+                                style="display: flex; flex-flow: row"
+                            >
+                                <mat-form-field appearance="outline">
+                                    <mat-label>{{ x.value }}</mat-label>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        [formControlName]="i"
+                                    />
+                                </mat-form-field>
+                                <div cdkDragHandle>DRAG</div>
+                                <div cdkDragHandle>ADD</div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
                 </div>
-                <div style="display: flex; flex-flow: row">
-                    <div
-                        (cdkDropListDropped)="drop($event)"
-                        *ngLet="gridForm.controls['yAxis'].value as yAxis"
-                        [formArrayName]="yAxis"
-                        cdkDropList
-                        style="display: flex; flex-flow: column"
-                    >
-                        <span>Y-Axis</span>
-                        <div
+            </div>
+
+            <div style="display: flex; flex-flow: row">
+                <div
+                    (cdkDropListDropped)="drop($event)"
+                    *ngLet="gridForm.controls['yAxis'].value as yAxis"
+                    cdkDropList
+                    style="display: flex; flex-flow: column"
+                >
+                    <!-- input title -->
+                    <span>Y-Axis</span>
+
+                    <!-- axis type -->
+                    <mat-select formControlName="yAxis">
+                        <mat-option
                             *ngFor="
-                                let y of $any(
-                                    $any(gridForm.controls.axisOptions)
-                                        .controls[yAxis].controls
-                                );
-                                let i = index
+                                let opt of gridForm.controls['axisOptions']
+                                    .controls | keyvalue
                             "
-                            cdkDrag
-                            style="display: flex; flex-flow: row"
+                            [value]="$any(AXES)[opt.key].id"
                         >
-                            <mat-form-field appearance="outline">
-                                <mat-label>{{ y.value }}</mat-label>
-                                <input
-                                    matInput
-                                    type="number"
-                                    [formControlName]="i"
-                                />
-                            </mat-form-field>
-                            <div cdkDragHandle>DRAG</div>
-                            <div cdkDragHandle>ADD</div>
-                        </div>
-                    </div>
+                            {{ $any(AXES)[opt.key].name }}
+                        </mat-option>
+                    </mat-select>
+
+                    <!-- axis values -->
+                    <ng-container formGroupName="axisOptions">
+                        <ng-container [formArrayName]="yAxis">
+                            <div
+                                *ngFor="
+                                    let y of $any(
+                                        $any(gridForm.controls.axisOptions)
+                                            .controls[yAxis].controls
+                                    );
+                                    let i = index
+                                "
+                                cdkDrag
+                                style="display: flex; flex-flow: row"
+                            >
+                                <mat-form-field appearance="outline">
+                                    <mat-label>{{ y.value }}</mat-label>
+                                    <input
+                                        matInput
+                                        type="number"
+                                        [formControlName]="i"
+                                    />
+                                </mat-form-field>
+                                <div cdkDragHandle>DRAG</div>
+                                <div cdkDragHandle>ADD</div>
+                            </div>
+                        </ng-container>
+                    </ng-container>
                 </div>
-            </ng-container>
+            </div>
         </form>
     </div>
 

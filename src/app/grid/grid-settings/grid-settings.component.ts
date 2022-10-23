@@ -79,7 +79,7 @@ export class GridSettingsComponent {
             )
             .subscribe()
 
-        this.gridForm.valueChanges.subscribe(this.updateStore)
+        this.gridForm.valueChanges.subscribe(this.updateStore.bind(this))
 
         this.subGrid = this.store.select(selectGrid).subscribe((grid) => {
             this.activeGrid = grid
@@ -91,7 +91,9 @@ export class GridSettingsComponent {
         this.subGrid.unsubscribe()
     }
 
-    private updateStore(form?: typeof this.gridForm.value): void {
+    private updateStore(
+        form?: GridSettingsComponent['gridForm']['value']
+    ): void {
         form = form || this.gridForm.value
         this.store.dispatch(
             updateGridForm({
@@ -152,6 +154,10 @@ export class GridSettingsComponent {
 
         // Notify form update
         this.updateStore()
+    }
+
+    get AXES() {
+        return AXES
     }
 
     drop(event: CdkDragDrop<number[]>) {}

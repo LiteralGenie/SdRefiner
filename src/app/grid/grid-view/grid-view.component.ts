@@ -1,10 +1,18 @@
-import { Component } from '@angular/core'
+import { Component, ElementRef, ViewChild } from '@angular/core'
 import { Store } from '@ngrx/store'
-import { filter } from 'rxjs'
+import * as d3 from 'd3'
+import {
+    filter,
+    map,
+    Observable,
+    ReplaySubject,
+    share,
+    tap,
+    withLatestFrom,
+} from 'rxjs'
 import { DataService } from 'src/app/services/data.service'
-import { GridImage } from '../grid-image/grid-image.component'
 import { selectGrid } from '../store'
-import { Grid } from '../types'
+import { Grid, ImageParams } from '../types'
 
 @Component({
     selector: 'app-grid-view',
@@ -12,11 +20,123 @@ import { Grid } from '../types'
     styleUrls: ['./grid-view.component.scss'],
 })
 export class GridViewComponent {
-    grid$ = this.store
-        .select(selectGrid)
-        .pipe(filter((grid) => !!grid))
-        .subscribe(this.loadGrid.bind(this))
-    images: GridImage[][] = []
+    grid$ = this.store.select(selectGrid).pipe(
+        filter((grid) => !!grid),
+        share()
+    )
+    images$ = new ReplaySubject<GridImage[][]>(1)
+
+    tracks$: Observable<[Track[], Track[], GridImage[][]]> = this.images$.pipe(
+        withLatestFrom(this.grid$),
+        map(([images, grid]) => {
+            // Dims
+            const rowHeights = images
+                .map((_, i) => maxHeight(i, images))
+                .map((val) => val * this.scale)
+
+            const colWidths = images
+                .map((_, i) => maxWidth(i, images))
+                .map((val) => val * this.scale)
+
+            // Titles
+            const rowTitles = grid.yValues.map((val) =>
+                grid.yAxis.mapDisplay(grid.baseParams, val)
+            )
+            const colTitles = grid.xValues.map((val) =>
+                grid.xAxis.mapDisplay(grid.baseParams, val)
+            )
+
+            // Tracks
+            const rowTracks = images.map((_, i) => {
+                return new Track(
+                    rowHeights[i],
+                    colWidths,
+                    rowTitles[i],
+                    colTitles
+                )
+            })
+            const colTracks = images[0].map((_, i) => {
+                return new Track(
+                    colWidths[i],
+                    rowHeights,
+                    colTitles[i],
+                    rowTitles
+                )
+            })
+
+            return [rowTracks, colTracks, images] as [
+                Track[],
+                Track[],
+                GridImage[][]
+            ]
+
+            function maxHeight(row: number, images: GridImage[][]): number {
+                return Math.max(
+                    ...images[row].map((cell) => cell.params.height)
+                )
+            }
+
+            function maxWidth(col: number, images: GridImage[][]): number {
+                return Math.max(
+                    ...images
+                        .map((row) => row[col])
+                        .map((cell) => cell.params.width)
+                )
+            }
+        }),
+        share()
+    )
+
+    @ViewChild('containerEl') containerEl!: ElementRef<Element>
+    scale = 1
+
+    ngOnInit() {
+        this.grid$.subscribe(this.loadGrid.bind(this))
+        // this.images$.subscribe((x) => console.log('images', x))
+        // this.tracks$.subscribe((x) => console.log('tracks', x))
+        // this.rows$.subscribe((x) => console.log('rows', x))
+    }
+
+    ngAfterViewInit() {
+        const el = this.containerEl.nativeElement
+        const container = d3.select(el)
+        const images = d3.select(el.children[3])
+        const yAxis = d3.select(el.children[2])
+        const xAxis = d3.select(el.children[1])
+
+        const dragBehavior = d3.drag()
+        const zoomBehavior = d3.zoom()
+        container.call(zoomBehavior).datum({})
+
+        zoomBehavior.on('zoom', ({ sourceEvent, transform: tfm }) => {
+            images.style(
+                'transform',
+                `translate(${tfm.x}px, ${tfm.y}px) scale(${tfm.k})`
+            )
+            //     .style('transform-origin', '0 0')
+
+            // yAxis
+            //     .style('transform', `translate(0, ${tfm.y}px)`)
+            //     .style('transform-origin', '0 0')
+
+            // xAxis
+            //     .style('transform', `translate(${tfm.x}px, 0)`)
+            //     .style('transform-origin', '0 0')
+
+            this.scale = tfm.k
+        })
+
+        // dragBehavior.on('start', (ev, d: any) => {
+        //     d.start = { x: ev.x, y: ev.y }
+        //     d.scrollStart = { x: cell.scrollLeft, y: cell.scrollTop }
+        // })
+
+        // dragBehavior.on('drag', (ev, d: any) => {
+        //     console.log(ev, d)
+        //     cell.scrollTop = d.scrollStart.y - (ev.y - d.start.y)
+        //     cell.scrollLeft = d.scrollStart.x - (ev.x - d.start.x)
+        // })
+    }
 
     private async loadGrid(grid: Grid) {
         // Define image params
@@ -35,10 +155,8 @@ export class GridViewComponent {
             images.push(row)
         })
 
-        this.images = images
-
         // Load images
-        this.images.forEach((row) => {
+        images.forEach((row) => {
             row.forEach((cell) => {
                 cell.loadCached()
             })
@@ -48,59 +166,51 @@ export class GridViewComponent {
                 await cell.load()
             }
         }
-    }
 
-    get gridStyles() {
-        const rowHeights = this.images.map((_, i) => maxHeight(i, this.images))
-        const colWidths = this.images[0].map((_, i) => maxWidth(i, this.images))
-
-        return {
-            display: 'grid',
-            'grid-template-rows': rowHeights
-                .map((height) => `${height}px`)
-                .join(' '),
-            'grid-template-columns': colWidths
-                .map((width) => `${width}px`)
-                .join(' '),
-        }
-
-        function maxWidth(col: number, images: GridImage[][]): number {
-            return Math.max(
-                ...images
-                    .map((row) => row[col])
-                    .map((cell) => cell.params.width)
-            )
-        }
-        function maxHeight(row: number, images: GridImage[][]): number {
-            return Math.max(...images[row].map((cell) => cell.params.height))
-        }
-    }
-
-    get colWidths() {
-        return this.images[0]
-            .map((_, i) => maxWidth(i, this.images))
-            .map((width) => `${width}px`)
-            .join(' ')
-
-        function maxWidth(col: number, images: GridImage[][]): number {
-            return Math.max(
-                ...images
-                    .map((row) => row[col])
-                    .map((cell) => cell.params.width)
-            )
-        }
-    }
-
-    get rowHeights() {
-        return this.images
-            .map((_, i) => maxHeight(i, this.images))
-            .map((height) => `${height}px`)
-            .join(' ')
-
-        function maxHeight(row: number, images: GridImage[][]): number {
-            return Math.max(...images[row].map((cell) => cell.params.height))
-        }
+        this.images$.next(images)
     }
 
     constructor(private store: Store, private ds: DataService) {}
+}
+
+class Track {
+    constructor(
+        public dim: number,
+        public scDims: number[],
+        public title: string,
+        public scTitles: string[]
+    ) {
+        const arrs = [scDims, scTitles]
+        if (arrs.slice(1).some((lst) => lst.length !== arrs[0].length))
+            throw Error('Secondary values have different lengths')
+    }
+
+    pos(index: number): number {
+        return this.scDims
+            .slice(0, index)
+            .reduce((total, val) => total + val, 0)
+    }
+}
+
+class GridImage {
+    data?: string
+    status: 'IDLE' | 'LOADING' | 'LOADED' = 'IDLE'
+
+    constructor(private ds: DataService, public readonly params: ImageParams) {}
+
+    public async loadCached(): Promise<boolean> {
+        const response = await this.ds.getImageCached(this.params)
+        if (!response) return false
+
+        this.data = response
+        return true
+    }
+
+    public async load() {
+        if (this.status === 'LOADED' || this.status === 'LOADING') return
+
+        this.status = 'LOADING'
+        this.data = await this.ds.getImage(this.params)
+        this.status = 'LOADED'
+    }
 }

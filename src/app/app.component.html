@@ -13,8 +13,8 @@
         <mat-toolbar>
             <button (click)="drawer.toggle()" mat-button>DRAWER</button>
         </mat-toolbar>
-        <div style="overflow: auto">
-            <app-grid-view></app-grid-view>
+        <div [style.height]="'calc(100% - 128px)'">
+            <app-grid-view [style.height.%]="100"></app-grid-view>
         </div>
         <mat-toolbar>
             <button (click)="drawer.toggle()" mat-button>MINUS</button>
