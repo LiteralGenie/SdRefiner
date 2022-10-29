@@ -1,6 +1,18 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { firstValueFrom } from 'rxjs'
+import {
+    concat,
+    concatMap,
+    defer,
+    EMPTY,
+    firstValueFrom,
+    from,
+    map,
+    of,
+    Subscription,
+    switchMap,
+    tap,
+} from 'rxjs'
 
 const API_URL = 'http://localhost:8860'
 
@@ -24,9 +36,53 @@ export class DataService {
         return await firstValueFrom(
             this.http.post<string | null>(url, {
                 parameters: imageParams,
-                onlyCache: true,
+                only_cache: true,
             })
         )
+    }
+
+    private activeBatch: Subscription = EMPTY.subscribe()
+    public queueBatchLoad(images: Image[]): void {
+        this.activeBatch.unsubscribe()
+
+        const loadCached$ = of(...images).pipe(
+            concatMap((img) => from(img.loadCached()))
+        )
+        const load$ = of(...images).pipe(
+            concatMap((img) => {
+                return from(img.load())
+            })
+        )
+
+        this.activeBatch = concat(loadCached$, load$).subscribe()
+    }
+}
+
+export class Image {
+    data?: string
+    status: 'IDLE' | 'LOADING' | 'LOADED' = 'IDLE'
+
+    constructor(private ds: DataService, public readonly params: ImageParams) {}
+
+    public async loadCached(): Promise<boolean> {
+        const response = await this.ds.getImageCached(this.params)
+        if (!response) return false
+
+        this.data = response
+        return true
+    }
+
+    public async load() {
+        console.log('loading', this.params.prompt)
+        if (this.status === 'LOADED' || this.status === 'LOADING') return
+
+        this.status = 'LOADING'
+        try {
+            this.data = await this.ds.getImage(this.params)
+            this.status = 'LOADED'
+        } catch (e) {
+            this.status = 'IDLE'
+        }
     }
 }
 

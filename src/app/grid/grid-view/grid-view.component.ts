@@ -1,10 +1,10 @@
-import { Component, ElementRef, ViewChild } from '@angular/core'
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core'
 import { Store } from '@ngrx/store'
 import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
-import { DataService } from 'src/app/services/data.service'
+import { DataService, Image } from 'src/app/services/data.service'
 import { selectGrid } from '../store'
-import { Grid, ImageParams } from '../types'
+import { Grid } from '../types'
 
 @Component({
     selector: 'app-grid-view',
@@ -12,6 +12,10 @@ import { Grid, ImageParams } from '../types'
     styleUrls: ['./grid-view.component.scss'],
 })
 export class GridViewComponent {
+    @ViewChild('containerEl') containerEl!: ElementRef<Element>
+    scale = 1
+    isPressingSpace = false
+
     private grid$ = this.store.select(selectGrid).pipe(
         filter((grid) => !!grid),
         share()
@@ -48,13 +52,13 @@ export class GridViewComponent {
 
             return new GridView(rowTracks, colTracks, images)
 
-            function maxHeight(row: number, images: GridImage[][]): number {
+            function maxHeight(row: number, images: Image[][]): number {
                 return Math.max(
                     ...images[row].map((cell) => cell.params.height)
                 )
             }
 
-            function maxWidth(col: number, images: GridImage[][]): number {
+            function maxWidth(col: number, images: Image[][]): number {
                 return Math.max(
                     ...images
                         .map((row) => row[col])
@@ -62,26 +66,12 @@ export class GridViewComponent {
                 )
             }
         }),
-        tap(async (grid) => {
-            // Load cached images
-            grid.images.forEach((row) => {
-                row.forEach((cell) => {
-                    cell.loadCached()
-                })
-            })
-
-            // Generate the rest
-            for (let row of grid.images) {
-                for (let cell of row) {
-                    await cell.load()
-                }
-            }
+        tap((grid) => {
+            const cells = grid.images.flatMap((row) => row)
+            this.ds.queueBatchLoad(cells)
         }),
         shareReplay(1)
     )
-
-    @ViewChild('containerEl') containerEl!: ElementRef<Element>
-    scale = 1
 
     ngOnInit() {
         this.grid$.subscribe(this.loadGrid.bind(this))
@@ -162,17 +152,17 @@ export class GridViewComponent {
         })
     }
 
-    private loadGrid(grid: Grid): GridImage[][] {
-        const images: GridImage[][] = []
+    private loadGrid(grid: Grid): Image[][] {
+        const images: Image[][] = []
         const { baseParams, xAxis, xValues, yAxis, yValues } = grid
 
         yValues.forEach((yVal) => {
-            const row: GridImage[] = []
+            const row: Image[] = []
             let paramsRow = yAxis.mapParams(baseParams, yVal)
 
             xValues.forEach((xVal) => {
                 const paramsCell = xAxis.mapParams(paramsRow, xVal)
-                row.push(new GridImage(this.ds, paramsCell))
+                row.push(new Image(this.ds, paramsCell))
             })
 
             images.push(row)
@@ -182,13 +172,16 @@ export class GridViewComponent {
     }
 
     constructor(private store: Store, private ds: DataService) {}
+
+    /* prettier-ignore */ @HostListener('document:keydown.space') onSpaceDown() { this.isPressingSpace = true }
+    /* prettier-ignore */ @HostListener('document:keyup.space') onSpaceUp() { this.isPressingSpace = false }
 }
 
 class GridView {
     constructor(
         public rows: Track[],
         public cols: Track[],
-        public images: GridImage[][]
+        public images: Image[][]
     ) {}
 
     cellAt(row: number, col: number) {
@@ -215,27 +208,4 @@ class GridView {
 
 class Track {
     constructor(public dim: number, public title: string) {}
-}
-
-class GridImage {
-    data?: string
-    status: 'IDLE' | 'LOADING' | 'LOADED' = 'IDLE'
-
-    constructor(private ds: DataService, public readonly params: ImageParams) {}
-
-    public async loadCached(): Promise<boolean> {
-        const response = await this.ds.getImageCached(this.params)
-        if (!response) return false
-
-        this.data = response
-        return true
-    }
-
-    public async load() {
-        if (this.status === 'LOADED' || this.status === 'LOADING') return
-
-        this.status = 'LOADING'
-        this.data = await this.ds.getImage(this.params)
-        this.status = 'LOADED'
-    }
 }

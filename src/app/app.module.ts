@@ -24,6 +24,7 @@ import { AppComponent } from './app.component'
 import { GridSettingsComponent } from './grid/grid-settings/grid-settings.component'
 import { GridViewComponent } from './grid/grid-view/grid-view.component'
 import { gridFormReducer, gridReducer } from './grid/store'
+import { ContextMenuModule } from '@perfectmemory/ngx-contextmenu'
 
 @NgModule({
     declarations: [AppComponent, GridSettingsComponent, GridViewComponent],
@@ -49,6 +50,7 @@ import { gridFormReducer, gridReducer } from './grid/store'
         NgLetModule,
         ReactiveFormsModule,
         StoreDevtoolsModule.instrument(),
+        ContextMenuModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

@@ -1,3 +1,6 @@
+@import "@angular/cdk/overlay-prebuilt.css";
+@import "./node_modules/@perfectmemory/ngx-contextmenu/src/assets/stylesheets/base.scss";
+
 html,
 body,
 app-root {
@@ -6,4 +9,36 @@ app-root {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.context-menu {
+    /* Styling of the element where a context menu can appear */
+    --ngx-contextmenu-focusable-border-bottom: 1px dotted #70757e;
+
+    /* Styling of the context menu itself */
+    --ngx-contextmenu-background-color: #303030;
+    --ngx-contextmenu-border-radius: 4px;
+    --ngx-contextmenu-border: 1px solid rgba(0, 0, 0, 0.18);
+    --ngx-contextmenu-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
+    --ngx-contextmenu-font-size: 14px;
+    --ngx-contextmenu-margin: 2px 0 0;
+    --ngx-contextmenu-min-width: 160px;
+    --ngx-contextmenu-outline: 1px solid #70757e;
+    --ngx-contextmenu-padding: 5px 0;
+    --ngx-contextmenu-text-color: rgba(255, 255, 255, 0.7);
+    --ngx-contextmenu-text-disabled-color: #8a909a;
+
+    /* Styling of context menu items */
+    --ngx-contextmenu-item-arrow-left: "◀";
+    --ngx-contextmenu-item-arrow-right: "▶";
+    --ngx-contextmenu-item-background-hover-color: #000;
+    --ngx-contextmenu-item-separator-color: #8a909a;
+    --ngx-contextmenu-item-separator-padding: 10px;
+    --ngx-contextmenu-item-separator-width: 90%;
+    --ngx-contextmenu-item-padding: 6px 20px;
+    --ngx-contextmenu-item-text-hover-color: #fff;
+
+    li[role="separator"] {
+        margin-left: 15px;
+    }
 }

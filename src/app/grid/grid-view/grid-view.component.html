@@ -17,6 +17,10 @@
             <div
                 *ngFor="let col of gridView.cols"
                 [style.width.px]="col.dim * scale"
+                [style.display]="'flex'"
+                [style.flex-flow]="'row'"
+                [style.justify-content]="'center'"
+                [style.font-size.rem]="1.5"
             >
                 {{ col.title }}
             </div>
@@ -29,6 +33,10 @@
             <div
                 *ngFor="let row of gridView.rows"
                 [style.height.px]="row.dim * scale"
+                [style.display]="'flex'"
+                [style.flex-flow]="'column'"
+                [style.justify-content]="'center'"
+                [style.font-size.rem]="1.5"
             >
                 {{ row.title }}
             </div>
@@ -52,6 +60,8 @@
                             [attr.x]="cell.x"
                             [attr.y]="cell.y"
                             [attr.href]="cell.image.data"
+                            [contextMenu]="contextMenu"
+                            contextMenuValue="value"
                         />
                     </g>
                 </g>
@@ -59,3 +69,18 @@
         </g>
     </svg>
 </div>
+
+<context-menu #contextMenu menuClass="context-menu">
+    <ng-template contextMenuItem [passive]="true">
+        <span class="menu-item-title">Context menu title</span>
+    </ng-template>
+
+    <ng-template contextMenuItem let-value
+        >This is the context menu value "{{ value }}"</ng-template
+    >
+    <ng-template contextMenuItem let-value> Cut {{ value }} </ng-template>
+    <ng-template contextMenuItem let-value [divider]="true"></ng-template>
+    <ng-template contextMenuItem [disabled]="true">
+        Disabled menu item
+    </ng-template>
+</context-menu>
