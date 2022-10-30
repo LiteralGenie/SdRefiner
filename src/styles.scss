@@ -11,6 +11,16 @@ body {
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+.flex-row {
+    display: flex;
+    flex-flow: row;
+}
+
+.flex-col {
+    display: flex;
+    flex-flow: column;
+}
+
 .context-menu {
     /* Styling of the element where a context menu can appear */
     --ngx-contextmenu-focusable-border-bottom: 1px dotted #70757e;

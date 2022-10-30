@@ -10,6 +10,7 @@
             *ngIf="loaded"
             [formGroup]="gridForm"
             style="display: flex; flex-flow: column"
+            (keydown.control.enter)="save()"
         >
             <ng-container formGroupName="baseParams">
                 <mat-form-field appearance="outline">
@@ -41,12 +42,8 @@
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field appearance="outline">
-                        <mat-label>CFG Scale</mat-label>
-                        <input
-                            formControlName="cfg_scale"
-                            matInput
-                            type="number"
-                        />
+                        <mat-label>Steps</mat-label>
+                        <input formControlName="steps" matInput type="number" />
                     </mat-form-field>
                 </div>
                 <div>
@@ -65,8 +62,12 @@
                 </div>
                 <div>
                     <mat-form-field appearance="outline">
-                        <mat-label>Steps</mat-label>
-                        <input formControlName="steps" matInput type="number" />
+                        <mat-label>CFG Scale</mat-label>
+                        <input
+                            formControlName="cfg_scale"
+                            matInput
+                            type="number"
+                        />
                     </mat-form-field>
                     <mat-form-field appearance="outline">
                         <mat-label>Seed</mat-label>
@@ -77,179 +78,35 @@
 
             <mat-divider></mat-divider>
 
-            <div style="display: flex; flex-flow: row">
-                <!-- x axis -->
-                <div
-                    *ngLet="gridForm.controls['xAxis'].value as xAxis"
-                    style="display: flex; flex-flow: column; width: 100%"
-                >
-                    <!-- axis type -->
-                    <mat-form-field appearance="outline">
-                        <mat-label>X-Axis</mat-label>
-                        <mat-select formControlName="xAxis">
-                            <mat-option
-                                *ngFor="
-                                    let opt of gridForm.controls['axisOptions']
-                                        .controls | keyvalue
-                                "
-                                [value]="$any(AXES)[opt.key].id"
-                            >
-                                {{ $any(AXES)[opt.key].name }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-
-                    <!-- axis values -->
-                    <ng-container formGroupName="axisOptions">
-                        <ng-container [formArrayName]="xAxis">
-                            <div
-                                *ngFor="
-                                    let x of $any(
-                                        $any(gridForm.controls.axisOptions)
-                                            .controls[xAxis].controls
-                                    );
-                                    let i = index;
-                                    trackBy: trackByIndex
-                                "
-                                style="
-                                    display: grid;
-                                    grid-template-columns: 1fr repeat(
-                                            4,
-                                            max-content
-                                        );
-                                "
-                            >
-                                <mat-form-field appearance="outline">
-                                    <mat-label>{{
-                                        AXES[xAxis].name
-                                    }}</mat-label>
-                                    <input
-                                        #input
-                                        matInput
-                                        type="number"
-                                        [formControlName]="i"
-                                    />
-                                </mat-form-field>
-                                <button
-                                    #down
-                                    mat-icon-button
-                                    class="mt-17"
-                                    (keydown.ArrowRight)="up.focus()"
-                                    (keydown.ArrowLeft)="remove.focus()"
-                                    (focusin)="onAxisButtonFocus($event, input)"
-                                >
-                                    <i class="las la-arrow-down"></i>
-                                </button>
-                                <button
-                                    #up
-                                    mat-icon-button
-                                    class="mt-17"
-                                    (keydown.ArrowRight)="add.focus()"
-                                    (keydown.ArrowLeft)="down.focus()"
-                                    tabindex="-1"
-                                >
-                                    <i class="las la-arrow-up"></i>
-                                </button>
-                                <button
-                                    #add
-                                    mat-icon-button
-                                    class="mt-17"
-                                    (keydown.ArrowRight)="remove.focus()"
-                                    (keydown.ArrowLeft)="up.focus()"
-                                    tabindex="-1"
-                                >
-                                    <i class="las la-plus"></i>
-                                </button>
-                                <button
-                                    #remove
-                                    mat-icon-button
-                                    class="mt-17"
-                                    (keydown.ArrowRight)="down.focus()"
-                                    (keydown.ArrowLeft)="add.focus()"
-                                    tabindex="-1"
-                                >
-                                    <i class="las la-times"></i>
-                                </button>
-                            </div>
-                        </ng-container>
-                    </ng-container>
-                </div>
-            </div>
+            <!-- x-axis -->
+            <ng-container
+                *ngTemplateOutlet="
+                    axisTemplate;
+                    context: {
+                        controlId: 'xAxis',
+                        title: 'X-Axis',
+                        formGroup: gridForm
+                    }
+                "
+            ></ng-container>
 
             <mat-divider></mat-divider>
 
             <!-- y axis -->
-            <div style="display: flex; flex-flow: row">
-                <div
-                    *ngLet="gridForm.controls['yAxis'].value as yAxis"
-                    style="display: flex; flex-flow: column; width: 100%"
-                >
-                    <!-- axis type -->
-                    <mat-form-field appearance="outline">
-                        <mat-label>Y-Axis</mat-label>
-                        <mat-select formControlName="yAxis">
-                            <mat-option
-                                *ngFor="
-                                    let opt of gridForm.controls['axisOptions']
-                                        .controls | keyvalue
-                                "
-                                [value]="$any(AXES)[opt.key].id"
-                            >
-                                {{ $any(AXES)[opt.key].name }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-
-                    <!-- axis values -->
-                    <ng-container formGroupName="axisOptions">
-                        <ng-container [formArrayName]="yAxis">
-                            <div
-                                *ngFor="
-                                    let x of $any(
-                                        $any(gridForm.controls.axisOptions)
-                                            .controls[yAxis].controls
-                                    );
-                                    let i = index
-                                "
-                                style="
-                                    display: grid;
-                                    grid-template-columns: 1fr repeat(
-                                            4,
-                                            max-content
-                                        );
-                                "
-                            >
-                                <mat-form-field appearance="outline">
-                                    <mat-label>{{
-                                        AXES[yAxis].name
-                                    }}</mat-label>
-                                    <input
-                                        matInput
-                                        type="number"
-                                        [formControlName]="i"
-                                    />
-                                </mat-form-field>
-                                <button mat-icon-button class="mt-17">
-                                    <i class="las la-arrow-down"></i>
-                                </button>
-                                <button mat-icon-button class="mt-17">
-                                    <i class="las la-arrow-up"></i>
-                                </button>
-                                <button mat-icon-button class="mt-17">
-                                    <i class="las la-plus"></i>
-                                </button>
-                                <button mat-icon-button class="mt-17">
-                                    <i class="las la-times"></i>
-                                </button>
-                            </div>
-                        </ng-container>
-                    </ng-container>
-                </div>
-            </div>
+            <ng-container
+                *ngTemplateOutlet="
+                    axisTemplate;
+                    context: {
+                        controlId: 'yAxis',
+                        title: 'Y-Axis',
+                        formGroup: gridForm
+                    }
+                "
+            ></ng-container>
         </form>
     </div>
 
-    <mat-toolbar>
+    <mat-toolbar style="justify-content: flex-end">
         <button [disabled]="!activeGrid" (click)="reset()" mat-button>
             Reset
         </button>
@@ -278,3 +135,105 @@
         margin: 5px 0px 25px 0px;
     }
 </style>
+
+<ng-template
+    #axisTemplate
+    let-controlId="controlId"
+    let-title="title"
+    let-formGroup="formGroup"
+>
+    <div [formGroup]="formGroup" class="flex-row">
+        <div
+            *ngLet="$any(gridForm.controls)[controlId].value as axisId"
+            class="flex-col"
+            style="width: 100%"
+        >
+            <!-- axis type -->
+            <mat-form-field appearance="outline">
+                <mat-label>{{ title }}</mat-label>
+                <mat-select [formControlName]="controlId">
+                    <mat-option
+                        *ngFor="
+                            let opt of gridForm.controls['axisOptions'].controls
+                                | keyvalue
+                        "
+                        [value]="$any(AXES)[opt.key].id"
+                    >
+                        {{ $any(AXES)[opt.key].name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- axis values -->
+            <ng-container formGroupName="axisOptions">
+                <ng-container [formArrayName]="axisId">
+                    <div
+                        *ngFor="
+                            let x of $any(
+                                $any(gridForm.controls.axisOptions).controls[
+                                    axisId
+                                ].controls
+                            );
+                            let i = index;
+                            trackBy: trackByIndex
+                        "
+                        style="
+                            display: grid;
+                            grid-template-columns: 1fr repeat(4, max-content);
+                        "
+                    >
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{ $any(AXES)[axisId].name }}</mat-label>
+                            <input
+                                #input
+                                matInput
+                                type="number"
+                                [formControlName]="i"
+                            />
+                        </mat-form-field>
+                        <button
+                            #down
+                            mat-icon-button
+                            class="mt-17"
+                            (keydown.ArrowRight)="up.focus()"
+                            (keydown.ArrowLeft)="remove.focus()"
+                            (focusin)="onAxisButtonFocus($event, input)"
+                        >
+                            <i class="las la-arrow-down"></i>
+                        </button>
+                        <button
+                            #up
+                            mat-icon-button
+                            class="mt-17"
+                            (keydown.ArrowRight)="add.focus()"
+                            (keydown.ArrowLeft)="down.focus()"
+                            tabindex="-1"
+                        >
+                            <i class="las la-arrow-up"></i>
+                        </button>
+                        <button
+                            #add
+                            mat-icon-button
+                            class="mt-17"
+                            (keydown.ArrowRight)="remove.focus()"
+                            (keydown.ArrowLeft)="up.focus()"
+                            tabindex="-1"
+                        >
+                            <i class="las la-plus"></i>
+                        </button>
+                        <button
+                            #remove
+                            mat-icon-button
+                            class="mt-17"
+                            (keydown.ArrowRight)="down.focus()"
+                            (keydown.ArrowLeft)="add.focus()"
+                            tabindex="-1"
+                        >
+                            <i class="las la-times"></i>
+                        </button>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>

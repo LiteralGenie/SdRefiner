@@ -1,4 +1,3 @@
-import { CdkDragDrop } from '@angular/cdk/drag-drop'
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { Store } from '@ngrx/store'
