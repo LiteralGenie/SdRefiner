@@ -276,7 +276,7 @@
             <!-- axis type -->
             <mat-form-field appearance="outline" [class.diff]="showDiffs">
                 <mat-label>{{ title }}</mat-label>
-                <mat-select [formControlName]="controlId" (selectionChange)="">
+                <mat-select [formControlName]="controlId">
                     <mat-option
                         *ngFor="
                             let opt of gridForm.controls['axisOptions'].controls
@@ -311,7 +311,7 @@
                                 ].controls
                             );
                             let i = index;
-                            trackBy: trackByIndex
+                            trackBy: trackByAxis
                         "
                         style="
                             display: grid;
@@ -331,9 +331,15 @@
                             #down
                             mat-icon-button
                             class="mt-17"
-                            (keydown.ArrowRight)="up.focus()"
-                            (keydown.ArrowLeft)="remove.focus()"
-                            (focusin)="onAxisButtonFocus($event, input)"
+                            (keydown.ArrowLeft)="
+                                onAxisButtonCycle($any(down), -1)
+                            "
+                            (keydown.ArrowRight)="
+                                onAxisButtonCycle($any(down), 1)
+                            "
+                            (keydown.shift.tab)="
+                                $event.preventDefault(); input.focus()
+                            "
                         >
                             <i class="las la-arrow-down"></i>
                         </button>
@@ -341,8 +347,15 @@
                             #up
                             mat-icon-button
                             class="mt-17"
-                            (keydown.ArrowRight)="add.focus()"
-                            (keydown.ArrowLeft)="down.focus()"
+                            (keydown.ArrowLeft)="
+                                onAxisButtonCycle($any(up), -1)
+                            "
+                            (keydown.ArrowRight)="
+                                onAxisButtonCycle($any(up), 1)
+                            "
+                            (keydown.shift.tab)="
+                                $event.preventDefault(); input.focus()
+                            "
                             tabindex="-1"
                         >
                             <i class="las la-arrow-up"></i>
@@ -351,8 +364,15 @@
                             #add
                             mat-icon-button
                             class="mt-17"
-                            (keydown.ArrowRight)="remove.focus()"
-                            (keydown.ArrowLeft)="up.focus()"
+                            (keydown.ArrowLeft)="
+                                onAxisButtonCycle($any(add), -1)
+                            "
+                            (keydown.ArrowRight)="
+                                onAxisButtonCycle($any(add), 1)
+                            "
+                            (keydown.shift.tab)="
+                                $event.preventDefault(); input.focus()
+                            "
                             tabindex="-1"
                         >
                             <i class="las la-plus"></i>
@@ -361,9 +381,17 @@
                             #remove
                             mat-icon-button
                             class="mt-17"
-                            (keydown.ArrowRight)="down.focus()"
-                            (keydown.ArrowLeft)="add.focus()"
+                            (keydown.ArrowLeft)="
+                                onAxisButtonCycle($any(remove), -1)
+                            "
+                            (keydown.ArrowRight)="
+                                onAxisButtonCycle($any(remove), 1)
+                            "
                             tabindex="-1"
+                            (keydown.shift.tab)="
+                                $event.preventDefault(); input.focus()
+                            "
+                            [disabled]="i === 0"
                         >
                             <i class="las la-times"></i>
                         </button>

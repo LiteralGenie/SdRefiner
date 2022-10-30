@@ -30,8 +30,8 @@ export type GridForm = {
 }
 
 export const DEFAULT_AXIS_OPTIONS = {
-    prompt: [] as string[],
-    prompt_negative: [] as string[],
+    prompt: [''] as string[],
+    prompt_negative: [''] as string[],
     steps: [10, 20, 30, 40] as number[],
     sampler: ['Euler a', 'LMS', 'DPM adaptive', 'DPM2 Karras'] as Sampler[],
     cfg: [5, 7, 9, 11, 13],

@@ -9,6 +9,7 @@ import {
     FormControl,
     FormGroup,
 } from '@angular/forms'
+import { MatButton } from '@angular/material/button'
 import { Store } from '@ngrx/store'
 import { Diff, diffObjects } from '@src/app/utils/compare'
 import {
@@ -71,40 +72,36 @@ export class GridSettingsComponent {
     constructor(private store: Store, private cdf: ChangeDetectorRef) {}
 
     ngOnInit() {
+        // Update form if another component edits form
         this.subGridForm = this.store
             .select(selectGridForm)
-            .pipe(
-                tap((gridForm) => {
-                    gridForm = JSON.parse(JSON.stringify(gridForm))
-                    this.loaded = true
+            .subscribe((gridForm) => {
+                gridForm = JSON.parse(JSON.stringify(gridForm))
+                this.loaded = true
 
-                    // Update base params
-                    this.gridForm.patchValue(
-                        {
-                            baseParams: gridForm.baseParams,
-                            xAxis: gridForm.activeAxis.x,
-                            yAxis: gridForm.activeAxis.y,
-                        },
-                        { emitEvent: false }
+                // Update base params
+                this.gridForm.patchValue(
+                    {
+                        baseParams: gridForm.baseParams,
+                        xAxis: gridForm.activeAxis.x,
+                        yAxis: gridForm.activeAxis.y,
+                    },
+                    { emitEvent: false }
+                )
+
+                // Update axis options
+                const control = this.gridForm.get('axisOptions') as FormGroup
+                for (let name of Object.keys(control.controls)) {
+                    control.removeControl(name, { emitEvent: false })
+                }
+                for (let name of Object.keys(gridForm.axisOptions)) {
+                    const value = gridForm.axisOptions[name as AxisId]
+                    const ctrl = new FormArray(
+                        value.map((x) => new FormControl(x))
                     )
-
-                    // Update axis options
-                    const control = this.gridForm.get(
-                        'axisOptions'
-                    ) as FormGroup
-                    for (let name of Object.keys(control.controls)) {
-                        control.removeControl(name, { emitEvent: false })
-                    }
-                    for (let name of Object.keys(gridForm.axisOptions)) {
-                        const value = gridForm.axisOptions[name as AxisId]
-                        const ctrl = new FormArray(
-                            value.map((x) => new FormControl(x))
-                        )
-                        control.addControl(name, ctrl, { emitEvent: false })
-                    }
-                })
-            )
-            .subscribe()
+                    control.addControl(name, ctrl, { emitEvent: false })
+                }
+            })
 
         this.gridForm.valueChanges.subscribe(this.updateStore.bind(this))
 
@@ -112,6 +109,7 @@ export class GridSettingsComponent {
             this.activeGrid = grid
         })
 
+        // Calculate form changes
         this.formChanges = combineLatest([
             this.store.select(selectGrid),
             this.store.select(selectGridForm),
@@ -223,18 +221,35 @@ export class GridSettingsComponent {
         }
     }
 
-    trackByIndex(index: number) {
-        return index
+    trackByAxis(index: number, value: any) {
+        return value
     }
 
-    onAxisButtonFocus($event: FocusEvent, input: HTMLElement) {
-        console.log($event.relatedTarget)
-        if (
-            ($event.relatedTarget as HTMLElement | null)?.nodeName === 'BUTTON'
-        ) {
-            $event.preventDefault()
-            input.focus()
-            return
+    onAxisButtonCycle(button: MatButton, direction: -1 | 1) {
+        const currentEl = button._elementRef.nativeElement
+        const parent = currentEl.parentElement as HTMLElement
+
+        const buttons = Array.from(parent.children).filter(
+            (el) => el.nodeName === 'BUTTON'
+        ) as HTMLElement[]
+        const input = parent.querySelector('input') as HTMLElement
+
+        const idx = buttons.findIndex((el) => el === currentEl)
+        let targetIdx = idx
+
+        while (true) {
+            targetIdx += direction
+
+            if (targetIdx < 0 || targetIdx >= buttons.length) {
+                input.focus()
+                return
+            }
+
+            const target = buttons[targetIdx] as HTMLButtonElement
+            if (!target.disabled) {
+                target.focus()
+                return
+            }
         }
     }
 
