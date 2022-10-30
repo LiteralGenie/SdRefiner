@@ -3,12 +3,7 @@ import {
     ChangeDetectorRef,
     Component,
 } from '@angular/core'
-import {
-    AbstractControl,
-    FormArray,
-    FormControl,
-    FormGroup,
-} from '@angular/forms'
+import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { MatButton } from '@angular/material/button'
 import { Store } from '@ngrx/store'
 import { Diff, diffObjects } from '@src/app/utils/compare'
@@ -20,8 +15,6 @@ import {
     of,
     pairwise,
     Subscription,
-    switchMap,
-    tap,
 } from 'rxjs'
 import { AXES, AxisId } from '../axis'
 import {
@@ -207,24 +200,6 @@ export class GridSettingsComponent {
         this.updateStore()
     }
 
-    private toGrid(): Grid {
-        const form = this.gridForm.value
-        const xAxisId = form.xAxis as AxisId
-        const yAxisId = form.yAxis as AxisId
-
-        return {
-            baseParams: form.baseParams as any,
-            xAxis: AXES[xAxisId],
-            xValues: form.axisOptions![xAxisId],
-            yAxis: AXES[yAxisId],
-            yValues: form.axisOptions![yAxisId],
-        }
-    }
-
-    trackByAxis(index: number, value: any) {
-        return value
-    }
-
     onAxisButtonCycle(button: MatButton, direction: -1 | 1) {
         const currentEl = button._elementRef.nativeElement
         const parent = currentEl.parentElement as HTMLElement
@@ -253,18 +228,31 @@ export class GridSettingsComponent {
         }
     }
 
+    onAxisReorder(array: FormArray, currentIndex: number, nextIndex: number) {
+        const control = array.at(currentIndex)
+
+        if (nextIndex >= 0 && nextIndex < array.length) {
+            array.removeAt(currentIndex, { emitEvent: false })
+            array.insert(nextIndex, control)
+        }
+    }
+
     ngAfterViewInit() {
         // this.save()
     }
 
-    get AXES() {
-        return AXES
-    }
+    private toGrid(): Grid {
+        const form = this.gridForm.value
+        const xAxisId = form.xAxis as AxisId
+        const yAxisId = form.yAxis as AxisId
 
-    get hasChanges(): boolean {
-        return Object.values(this.formDiff).some(
-            (obj) => Object.keys(obj as any).length > 0
-        )
+        return {
+            baseParams: form.baseParams as any,
+            xAxis: AXES[xAxisId],
+            xValues: form.axisOptions![xAxisId],
+            yAxis: AXES[yAxisId],
+            yValues: form.axisOptions![yAxisId],
+        }
     }
 
     getAxisDiff(type: 'xAxis' | 'yAxis'): Diff | undefined {
@@ -277,5 +265,19 @@ export class GridSettingsComponent {
         if (values) return values
 
         return undefined
+    }
+
+    get AXES() {
+        return AXES
+    }
+
+    get hasChanges(): boolean {
+        return Object.values(this.formDiff).some(
+            (obj) => Object.keys(obj as any).length > 0
+        )
+    }
+
+    trackByAxis(index: number, value: any) {
+        return value
     }
 }

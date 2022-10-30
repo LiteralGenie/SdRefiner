@@ -302,14 +302,17 @@
 
             <!-- axis values -->
             <ng-container formGroupName="axisOptions">
-                <ng-container [formArrayName]="axisId">
+                <ng-container
+                    *ngLet="
+                        $any(
+                            $any(gridForm.controls.axisOptions).controls[axisId]
+                        ) as controlArray
+                    "
+                    [formArrayName]="axisId"
+                >
                     <div
                         *ngFor="
-                            let x of $any(
-                                $any(gridForm.controls.axisOptions).controls[
-                                    axisId
-                                ].controls
-                            );
+                            let x of controlArray.controls;
                             let i = index;
                             trackBy: trackByAxis
                         "
@@ -329,6 +332,7 @@
                         </mat-form-field>
                         <button
                             #down
+                            (click)="onAxisReorder(controlArray, i, i + 1)"
                             mat-icon-button
                             class="mt-17"
                             (keydown.ArrowLeft)="
@@ -345,6 +349,7 @@
                         </button>
                         <button
                             #up
+                            (click)="onAxisReorder(controlArray, i, i - 1)"
                             mat-icon-button
                             class="mt-17"
                             (keydown.ArrowLeft)="
