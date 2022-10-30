@@ -237,6 +237,16 @@ export class GridSettingsComponent {
         }
     }
 
+    onAxisValueAdd(array: FormArray, currentIndex: number) {
+        const control = array.at(currentIndex)
+        const newControl = new FormControl(control.value)
+        array.insert(currentIndex + 1, newControl)
+    }
+
+    onAxisValueRemove(array: FormArray, currentIndex: number) {
+        array.removeAt(currentIndex)
+    }
+
     ngAfterViewInit() {
         // this.save()
     }

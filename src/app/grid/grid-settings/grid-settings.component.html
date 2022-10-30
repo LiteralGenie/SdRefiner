@@ -333,8 +333,6 @@
                         <button
                             #down
                             (click)="onAxisReorder(controlArray, i, i + 1)"
-                            mat-icon-button
-                            class="mt-17"
                             (keydown.ArrowLeft)="
                                 onAxisButtonCycle($any(down), -1)
                             "
@@ -344,14 +342,14 @@
                             (keydown.shift.tab)="
                                 $event.preventDefault(); input.focus()
                             "
+                            mat-icon-button
+                            class="mt-17"
                         >
                             <i class="las la-arrow-down"></i>
                         </button>
                         <button
                             #up
                             (click)="onAxisReorder(controlArray, i, i - 1)"
-                            mat-icon-button
-                            class="mt-17"
                             (keydown.ArrowLeft)="
                                 onAxisButtonCycle($any(up), -1)
                             "
@@ -362,13 +360,14 @@
                                 $event.preventDefault(); input.focus()
                             "
                             tabindex="-1"
+                            mat-icon-button
+                            class="mt-17"
                         >
                             <i class="las la-arrow-up"></i>
                         </button>
                         <button
                             #add
-                            mat-icon-button
-                            class="mt-17"
+                            (click)="onAxisValueAdd(controlArray, i)"
                             (keydown.ArrowLeft)="
                                 onAxisButtonCycle($any(add), -1)
                             "
@@ -379,13 +378,14 @@
                                 $event.preventDefault(); input.focus()
                             "
                             tabindex="-1"
+                            mat-icon-button
+                            class="mt-17"
                         >
                             <i class="las la-plus"></i>
                         </button>
                         <button
                             #remove
-                            mat-icon-button
-                            class="mt-17"
+                            (click)="onAxisValueRemove(controlArray, i)"
                             (keydown.ArrowLeft)="
                                 onAxisButtonCycle($any(remove), -1)
                             "
@@ -396,7 +396,9 @@
                             (keydown.shift.tab)="
                                 $event.preventDefault(); input.focus()
                             "
-                            [disabled]="i === 0"
+                            [disabled]="controlArray.length === 1"
+                            mat-icon-button
+                            class="mt-17"
                         >
                             <i class="las la-times"></i>
                         </button>
