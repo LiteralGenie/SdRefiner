@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { Store } from '@ngrx/store'
-import { EMPTY, Subscription, tap } from 'rxjs'
+import { Diff, DiffObject, diffObjects } from '@src/app/utils/compare'
+import { combineLatest, EMPTY, filter, Subscription, tap } from 'rxjs'
 import { AXES, AxisId } from '../axis'
 import {
     createGrid,
@@ -20,9 +21,17 @@ import { Grid } from '../types'
 export class GridSettingsComponent {
     loaded = false
     activeGrid?: Grid
+    formDiff: any = {
+        baseParams: {},
+        xAxis: {},
+        yAxis: {},
+        axisOptions: {},
+    }
+    showDiffs = false
 
     private subGridForm: Subscription = EMPTY.subscribe()
     private subGrid: Subscription = EMPTY.subscribe()
+    private formChanges: Subscription = EMPTY.subscribe()
 
     gridForm = new FormGroup({
         baseParams: new FormGroup({
@@ -83,11 +92,33 @@ export class GridSettingsComponent {
         this.subGrid = this.store.select(selectGrid).subscribe((grid) => {
             this.activeGrid = grid
         })
+
+        this.formChanges = combineLatest([
+            this.store.select(selectGrid),
+            this.store.select(selectGridForm),
+        ])
+            .pipe(filter(([grid]) => !!grid))
+            .subscribe(([grid]) => {
+                grid = { ...grid }
+                delete (grid as any).type
+                const original = (grid || {}) as any
+                const update = this.toGrid() as any
+                this.formDiff = {
+                    ...diffObjects(original || {}, update),
+                    baseParams: diffObjects(
+                        original?.baseParams || {},
+                        update.baseParams
+                    ),
+                    xAxis: diffObjects(original?.xAxis || {}, update.xAxis),
+                    yAxis: diffObjects(original?.yAxis || {}, update.yAxis),
+                }
+            })
     }
 
     ngOnDestroy() {
         this.subGridForm.unsubscribe()
         this.subGrid.unsubscribe()
+        this.formChanges.unsubscribe()
     }
 
     private updateStore(
@@ -107,18 +138,7 @@ export class GridSettingsComponent {
     }
 
     save() {
-        const form = this.gridForm.value
-        const xAxisId = form.xAxis as AxisId
-        const yAxisId = form.yAxis as AxisId
-        this.store.dispatch(
-            createGrid({
-                baseParams: form.baseParams as any,
-                xAxis: AXES[xAxisId],
-                xValues: form.axisOptions![xAxisId],
-                yAxis: AXES[yAxisId],
-                yValues: form.axisOptions![yAxisId],
-            })
-        )
+        this.store.dispatch(createGrid(this.toGrid()))
     }
 
     reset() {
@@ -155,8 +175,18 @@ export class GridSettingsComponent {
         this.updateStore()
     }
 
-    get AXES() {
-        return AXES
+    private toGrid(): Grid {
+        const form = this.gridForm.value
+        const xAxisId = form.xAxis as AxisId
+        const yAxisId = form.yAxis as AxisId
+
+        return {
+            baseParams: form.baseParams as any,
+            xAxis: AXES[xAxisId],
+            xValues: form.axisOptions![xAxisId],
+            yAxis: AXES[yAxisId],
+            yValues: form.axisOptions![yAxisId],
+        }
     }
 
     trackByIndex(index: number) {
@@ -176,5 +206,21 @@ export class GridSettingsComponent {
 
     ngAfterViewInit() {
         // this.save()
+    }
+
+    get AXES() {
+        return AXES
+    }
+
+    getAxisDiff(type: 'xAxis' | 'yAxis'): Diff | undefined {
+        const axis =
+            type === 'xAxis' ? this.formDiff.xAxis : this.formDiff.yAxis
+        if (axis.name) return axis.name
+
+        const values =
+            type === 'xAxis' ? this.formDiff.xValues : this.formDiff.yValues
+        if (values) return values
+
+        return undefined
     }
 }

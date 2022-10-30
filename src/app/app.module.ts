@@ -10,6 +10,7 @@ import { MatDividerModule } from '@angular/material/divider'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
+import { MatCheckboxModule } from '@angular/material/checkbox'
 import { MatSelectModule } from '@angular/material/select'
 import { MatSidenavModule } from '@angular/material/sidenav'
 import { MatTabsModule } from '@angular/material/tabs'
@@ -49,6 +50,7 @@ import { gridFormReducer, gridReducer } from './grid/store'
         ReactiveFormsModule,
         StoreDevtoolsModule.instrument(),
         ContextMenuModule,
+        MatCheckboxModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

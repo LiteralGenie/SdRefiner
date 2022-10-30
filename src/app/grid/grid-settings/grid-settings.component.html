@@ -13,24 +13,47 @@
             (keydown.control.enter)="save()"
         >
             <ng-container formGroupName="baseParams">
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" [class.diff]="showDiffs">
                     <mat-label>Prompt</mat-label>
                     <textarea
                         matInput
                         cdkTextareaAutosize
                         formControlName="prompt"
                     ></textarea>
+                    <mat-hint *ngIf="showDiffs">
+                        <ng-container
+                            *ngTemplateOutlet="
+                                hintTemplate;
+                                context: { diff: formDiff.baseParams.prompt }
+                            "
+                        >
+                        </ng-container>
+                    </mat-hint>
                 </mat-form-field>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" [class.diff]="showDiffs">
                     <mat-label for="prompt_negative">Negative Prompt</mat-label>
                     <textarea
                         matInput
                         cdkTextareaAutosize
                         formControlName="prompt_negative"
                     ></textarea>
+                    <mat-hint *ngIf="showDiffs">
+                        <ng-container
+                            *ngTemplateOutlet="
+                                hintTemplate;
+                                context: {
+                                    diff: formDiff.baseParams.prompt_negative
+                                }
+                            "
+                        >
+                        </ng-container>
+                    </mat-hint>
                 </mat-form-field>
                 <div>
-                    <mat-form-field appearance="outline">
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
                         <mat-label>Sampler</mat-label>
                         <mat-select formControlName="sampler">
                             <mat-option
@@ -40,38 +63,119 @@
                                 {{ smplr }}
                             </mat-option>
                         </mat-select>
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.sampler
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
                     </mat-form-field>
-                    <mat-form-field appearance="outline">
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
                         <mat-label>Steps</mat-label>
                         <input formControlName="steps" matInput type="number" />
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.steps
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
                     </mat-form-field>
                 </div>
                 <div>
-                    <mat-form-field appearance="outline">
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
                         <mat-label>Height</mat-label>
-                        <input formControlName="width" matInput type="number" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline">
-                        <mat-label>Width</mat-label>
                         <input
                             formControlName="height"
                             matInput
                             type="number"
                         />
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.height
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
+                    </mat-form-field>
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
+                        <mat-label>Width</mat-label>
+                        <input formControlName="width" matInput type="number" />
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.width
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
                     </mat-form-field>
                 </div>
                 <div>
-                    <mat-form-field appearance="outline">
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
                         <mat-label>CFG Scale</mat-label>
                         <input
                             formControlName="cfg_scale"
                             matInput
                             type="number"
                         />
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.cfg_scale
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
                     </mat-form-field>
-                    <mat-form-field appearance="outline">
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
                         <mat-label>Seed</mat-label>
                         <input formControlName="seed" matInput type="number" />
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.seed
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
                     </mat-form-field>
                 </div>
             </ng-container>
@@ -106,11 +210,16 @@
         </form>
     </div>
 
-    <mat-toolbar style="justify-content: flex-end">
-        <button [disabled]="!activeGrid" (click)="reset()" mat-button>
-            Reset
-        </button>
-        <button (click)="save()" mat-button>Save</button>
+    <mat-toolbar class="flex-row" style="justify-content: space-between">
+        <div class="flex-row">
+            <mat-checkbox [(ngModel)]="showDiffs">Show changes</mat-checkbox>
+        </div>
+        <div class="flex-row">
+            <button [disabled]="!activeGrid" (click)="reset()" mat-button>
+                Reset
+            </button>
+            <button (click)="save()" mat-button>Save</button>
+        </div>
     </mat-toolbar>
 </div>
 
@@ -134,6 +243,22 @@
     .mat-divider {
         margin: 5px 0px 25px 0px;
     }
+
+    .diff {
+        margin-bottom: 15px;
+    }
+
+    ::ng-deep .diff .mat-form-field-subscript-wrapper {
+        top: calc(100% - 1.83em);
+    }
+
+    ::ng-deep .mat-checkbox {
+        font-size: 14px;
+    }
+    ::ng-deep .mat-checkbox-frame,
+    ::ng-deep .mat-checkbox-background {
+        transform: scale(0.8);
+    }
 </style>
 
 <ng-template
@@ -149,7 +274,7 @@
             style="width: 100%"
         >
             <!-- axis type -->
-            <mat-form-field appearance="outline">
+            <mat-form-field appearance="outline" [class.diff]="showDiffs">
                 <mat-label>{{ title }}</mat-label>
                 <mat-select [formControlName]="controlId">
                     <mat-option
@@ -162,6 +287,17 @@
                         {{ $any(AXES)[opt.key].name }}
                     </mat-option>
                 </mat-select>
+                <mat-hint *ngIf="showDiffs">
+                    <ng-container *ngIf="formDiff[controlId].name as diff">
+                        <span *ngIf="diff.added" style="color: green">
+                            + {{ diff.added | json }}
+                        </span>
+                        <br />
+                        <span *ngIf="diff.removed" style="color: red">
+                            - {{ diff.removed | json }}
+                        </span>
+                    </ng-container>
+                </mat-hint>
             </mat-form-field>
 
             <!-- axis values -->
@@ -236,4 +372,16 @@
             </ng-container>
         </div>
     </div>
+</ng-template>
+
+<ng-template #hintTemplate let-diff="diff">
+    <ng-container *ngIf="diff">
+        <span *ngIf="diff.added" style="color: green">
+            + {{ diff.added | json }}
+        </span>
+        <br />
+        <span *ngIf="diff.removed" style="color: red">
+            - {{ diff.removed | json }}
+        </span>
+    </ng-container>
 </ng-template>
