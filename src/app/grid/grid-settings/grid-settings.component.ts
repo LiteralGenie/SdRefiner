@@ -42,6 +42,8 @@ export class GridSettingsComponent {
     }
     showDiffs = false
 
+    private ignoreUpdate = false
+
     private subGridForm: Subscription = EMPTY.subscribe()
     private subGrid: Subscription = EMPTY.subscribe()
     private formChanges: Subscription = EMPTY.subscribe()
@@ -68,6 +70,16 @@ export class GridSettingsComponent {
         // Update form if another component edits form
         this.subGridForm = this.store
             .select(selectGridForm)
+            .pipe(
+                filter(() => {
+                    if (this.ignoreUpdate) {
+                        this.ignoreUpdate = false
+                        return false
+                    } else {
+                        return true
+                    }
+                })
+            )
             .subscribe((gridForm) => {
                 gridForm = JSON.parse(JSON.stringify(gridForm))
                 this.loaded = true
@@ -102,7 +114,7 @@ export class GridSettingsComponent {
             this.activeGrid = grid
         })
 
-        // Calculate form changes
+        // Calculate unsaved changes
         this.formChanges = combineLatest([
             this.store.select(selectGrid),
             this.store.select(selectGridForm),
@@ -111,8 +123,10 @@ export class GridSettingsComponent {
             .subscribe(([grid]) => {
                 grid = { ...grid }
                 delete (grid as any).type
+
                 const original = (grid || {}) as any
                 const update = this.toGrid() as any
+
                 this.formDiff = {
                     ...diffObjects(original || {}, update),
                     baseParams: diffObjects(
@@ -138,6 +152,9 @@ export class GridSettingsComponent {
                     if (oldY === newY) yAxis?.setValue(oldX)
                 }
             })
+
+        xAxis!.valueChanges.subscribe(() => this.cdf.markForCheck())
+        yAxis!.valueChanges.subscribe(() => this.cdf.markForCheck())
     }
 
     ngOnDestroy() {
@@ -149,6 +166,8 @@ export class GridSettingsComponent {
     private updateStore(
         form?: GridSettingsComponent['gridForm']['value']
     ): void {
+        this.ignoreUpdate = true
+
         form = form || this.gridForm.value
         this.store.dispatch(
             updateGridForm({
@@ -287,7 +306,7 @@ export class GridSettingsComponent {
         )
     }
 
-    trackByAxis(index: number, value: any) {
-        return value
+    trackByAxis(index: number, control: FormControl) {
+        return control
     }
 }

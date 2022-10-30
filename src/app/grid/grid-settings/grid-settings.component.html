@@ -223,44 +223,6 @@
     </mat-toolbar>
 </div>
 
-<style>
-    form > div {
-        display: flex;
-        justify-content: space-between;
-    }
-
-    .las {
-        font-size: 1.7em;
-        height: 30px;
-        width: 30px;
-        margin-top: 4px;
-    }
-
-    .mt-17 {
-        margin-top: 10px;
-    }
-
-    .mat-divider {
-        margin: 5px 0px 25px 0px;
-    }
-
-    .diff {
-        margin-bottom: 15px;
-    }
-
-    ::ng-deep .diff .mat-form-field-subscript-wrapper {
-        top: calc(100% - 1.83em);
-    }
-
-    ::ng-deep .mat-checkbox {
-        font-size: 14px;
-    }
-    ::ng-deep .mat-checkbox-frame,
-    ::ng-deep .mat-checkbox-background {
-        transform: scale(0.8);
-    }
-</style>
-
 <ng-template
     #axisTemplate
     let-controlId="controlId"
@@ -343,7 +305,7 @@
                                 $event.preventDefault(); input.focus()
                             "
                             mat-icon-button
-                            class="mt-17"
+                            class="mt-10"
                         >
                             <i class="las la-arrow-down"></i>
                         </button>
@@ -361,7 +323,7 @@
                             "
                             tabindex="-1"
                             mat-icon-button
-                            class="mt-17"
+                            class="mt-10"
                         >
                             <i class="las la-arrow-up"></i>
                         </button>
@@ -379,7 +341,7 @@
                             "
                             tabindex="-1"
                             mat-icon-button
-                            class="mt-17"
+                            class="mt-10"
                         >
                             <i class="las la-plus"></i>
                         </button>
@@ -398,7 +360,7 @@
                             "
                             [disabled]="controlArray.length === 1"
                             mat-icon-button
-                            class="mt-17"
+                            class="mt-10"
                         >
                             <i class="las la-times"></i>
                         </button>
