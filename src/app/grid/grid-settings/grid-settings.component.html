@@ -276,7 +276,7 @@
             <!-- axis type -->
             <mat-form-field appearance="outline" [class.diff]="showDiffs">
                 <mat-label>{{ title }}</mat-label>
-                <mat-select [formControlName]="controlId">
+                <mat-select [formControlName]="controlId" (selectionChange)="">
                     <mat-option
                         *ngFor="
                             let opt of gridForm.controls['axisOptions'].controls

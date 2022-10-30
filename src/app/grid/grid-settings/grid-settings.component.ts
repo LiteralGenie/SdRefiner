@@ -1,8 +1,27 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { FormArray, FormControl, FormGroup } from '@angular/forms'
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+} from '@angular/core'
+import {
+    AbstractControl,
+    FormArray,
+    FormControl,
+    FormGroup,
+} from '@angular/forms'
 import { Store } from '@ngrx/store'
-import { Diff, DiffObject, diffObjects } from '@src/app/utils/compare'
-import { combineLatest, EMPTY, filter, Subscription, tap } from 'rxjs'
+import { Diff, diffObjects } from '@src/app/utils/compare'
+import {
+    combineLatest,
+    concat,
+    EMPTY,
+    filter,
+    of,
+    pairwise,
+    Subscription,
+    switchMap,
+    tap,
+} from 'rxjs'
 import { AXES, AxisId } from '../axis'
 import {
     createGrid,
@@ -49,7 +68,7 @@ export class GridSettingsComponent {
         axisOptions: new FormGroup({} as any),
     })
 
-    constructor(private store: Store) {}
+    constructor(private store: Store, private cdf: ChangeDetectorRef) {}
 
     ngOnInit() {
         this.subGridForm = this.store
@@ -111,6 +130,21 @@ export class GridSettingsComponent {
                     ),
                     xAxis: diffObjects(original?.xAxis || {}, update.xAxis),
                     yAxis: diffObjects(original?.yAxis || {}, update.yAxis),
+                }
+            })
+
+        // Swap axes if user picks same x / y axis
+        const xAxis = this.gridForm.get('xAxis')
+        const yAxis = this.gridForm.get('yAxis')
+        combineLatest([
+            concat(of(xAxis!.value), xAxis!.valueChanges),
+            concat(of(yAxis!.value), yAxis!.valueChanges),
+        ])
+            .pipe(pairwise())
+            .subscribe(([[oldX, oldY], [newX, newY]]) => {
+                if (newX === newY) {
+                    if (oldX === newX) xAxis?.setValue(oldY)
+                    if (oldY === newY) yAxis?.setValue(oldX)
                 }
             })
     }
