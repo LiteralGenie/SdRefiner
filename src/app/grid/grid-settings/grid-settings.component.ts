@@ -160,9 +160,22 @@ export class GridSettingsComponent {
         return AXES
     }
 
-    drop(event: CdkDragDrop<number[]>) {}
+    trackByIndex(index: number) {
+        return index
+    }
+
+    onAxisButtonFocus($event: FocusEvent, input: HTMLElement) {
+        console.log($event.relatedTarget)
+        if (
+            ($event.relatedTarget as HTMLElement | null)?.nodeName === 'BUTTON'
+        ) {
+            $event.preventDefault()
+            input.focus()
+            return
+        }
+    }
 
     ngAfterViewInit() {
-        this.save()
+        // this.save()
     }
 }

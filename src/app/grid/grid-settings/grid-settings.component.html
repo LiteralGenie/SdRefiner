@@ -5,7 +5,7 @@
         height: 100%;
     "
 >
-    <div style="min-height: 0; overflow: auto">
+    <div style="min-height: 0; overflow: auto; padding: 20px 20px">
         <form
             *ngIf="loaded"
             [formGroup]="gridForm"
@@ -41,10 +41,6 @@
                         </mat-select>
                     </mat-form-field>
                     <mat-form-field appearance="outline">
-                        <mat-label>Steps</mat-label>
-                        <input formControlName="steps" matInput type="number" />
-                    </mat-form-field>
-                    <mat-form-field appearance="outline">
                         <mat-label>CFG Scale</mat-label>
                         <input
                             formControlName="cfg_scale"
@@ -67,36 +63,41 @@
                         />
                     </mat-form-field>
                 </div>
-                <mat-form-field appearance="outline">
-                    <mat-label>Seed</mat-label>
-                    <input formControlName="seed" matInput type="number" />
-                </mat-form-field>
+                <div>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Steps</mat-label>
+                        <input formControlName="steps" matInput type="number" />
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Seed</mat-label>
+                        <input formControlName="seed" matInput type="number" />
+                    </mat-form-field>
+                </div>
             </ng-container>
 
             <mat-divider></mat-divider>
 
             <div style="display: flex; flex-flow: row">
+                <!-- x axis -->
                 <div
-                    (cdkDropListDropped)="drop($event)"
                     *ngLet="gridForm.controls['xAxis'].value as xAxis"
-                    cdkDropList
-                    style="display: flex; flex-flow: column"
+                    style="display: flex; flex-flow: column; width: 100%"
                 >
-                    <!-- input title -->
-                    <span>X-Axis</span>
-
                     <!-- axis type -->
-                    <mat-select formControlName="xAxis">
-                        <mat-option
-                            *ngFor="
-                                let opt of gridForm.controls['axisOptions']
-                                    .controls | keyvalue
-                            "
-                            [value]="$any(AXES)[opt.key].id"
-                        >
-                            {{ $any(AXES)[opt.key].name }}
-                        </mat-option>
-                    </mat-select>
+                    <mat-form-field appearance="outline">
+                        <mat-label>X-Axis</mat-label>
+                        <mat-select formControlName="xAxis">
+                            <mat-option
+                                *ngFor="
+                                    let opt of gridForm.controls['axisOptions']
+                                        .controls | keyvalue
+                                "
+                                [value]="$any(AXES)[opt.key].id"
+                            >
+                                {{ $any(AXES)[opt.key].name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
 
                     <!-- axis values -->
                     <ng-container formGroupName="axisOptions">
@@ -107,74 +108,139 @@
                                         $any(gridForm.controls.axisOptions)
                                             .controls[xAxis].controls
                                     );
-                                    let i = index
+                                    let i = index;
+                                    trackBy: trackByIndex
                                 "
-                                cdkDrag
-                                style="display: flex; flex-flow: row"
+                                style="
+                                    display: grid;
+                                    grid-template-columns: 1fr repeat(
+                                            4,
+                                            max-content
+                                        );
+                                "
                             >
                                 <mat-form-field appearance="outline">
-                                    <mat-label>{{ x.value }}</mat-label>
+                                    <mat-label>{{
+                                        AXES[xAxis].name
+                                    }}</mat-label>
                                     <input
+                                        #input
                                         matInput
                                         type="number"
                                         [formControlName]="i"
                                     />
                                 </mat-form-field>
-                                <div cdkDragHandle>DRAG</div>
-                                <div cdkDragHandle>ADD</div>
+                                <button
+                                    #down
+                                    mat-icon-button
+                                    class="mt-17"
+                                    (keydown.ArrowRight)="up.focus()"
+                                    (keydown.ArrowLeft)="remove.focus()"
+                                    (focusin)="onAxisButtonFocus($event, input)"
+                                >
+                                    <i class="las la-arrow-down"></i>
+                                </button>
+                                <button
+                                    #up
+                                    mat-icon-button
+                                    class="mt-17"
+                                    (keydown.ArrowRight)="add.focus()"
+                                    (keydown.ArrowLeft)="down.focus()"
+                                    tabindex="-1"
+                                >
+                                    <i class="las la-arrow-up"></i>
+                                </button>
+                                <button
+                                    #add
+                                    mat-icon-button
+                                    class="mt-17"
+                                    (keydown.ArrowRight)="remove.focus()"
+                                    (keydown.ArrowLeft)="up.focus()"
+                                    tabindex="-1"
+                                >
+                                    <i class="las la-plus"></i>
+                                </button>
+                                <button
+                                    #remove
+                                    mat-icon-button
+                                    class="mt-17"
+                                    (keydown.ArrowRight)="down.focus()"
+                                    (keydown.ArrowLeft)="add.focus()"
+                                    tabindex="-1"
+                                >
+                                    <i class="las la-times"></i>
+                                </button>
                             </div>
                         </ng-container>
                     </ng-container>
                 </div>
             </div>
 
+            <mat-divider></mat-divider>
+
+            <!-- y axis -->
             <div style="display: flex; flex-flow: row">
                 <div
-                    (cdkDropListDropped)="drop($event)"
                     *ngLet="gridForm.controls['yAxis'].value as yAxis"
-                    cdkDropList
-                    style="display: flex; flex-flow: column"
+                    style="display: flex; flex-flow: column; width: 100%"
                 >
-                    <!-- input title -->
-                    <span>Y-Axis</span>
-
                     <!-- axis type -->
-                    <mat-select formControlName="yAxis">
-                        <mat-option
-                            *ngFor="
-                                let opt of gridForm.controls['axisOptions']
-                                    .controls | keyvalue
-                            "
-                            [value]="$any(AXES)[opt.key].id"
-                        >
-                            {{ $any(AXES)[opt.key].name }}
-                        </mat-option>
-                    </mat-select>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Y-Axis</mat-label>
+                        <mat-select formControlName="yAxis">
+                            <mat-option
+                                *ngFor="
+                                    let opt of gridForm.controls['axisOptions']
+                                        .controls | keyvalue
+                                "
+                                [value]="$any(AXES)[opt.key].id"
+                            >
+                                {{ $any(AXES)[opt.key].name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
 
                     <!-- axis values -->
                     <ng-container formGroupName="axisOptions">
                         <ng-container [formArrayName]="yAxis">
                             <div
                                 *ngFor="
-                                    let y of $any(
+                                    let x of $any(
                                         $any(gridForm.controls.axisOptions)
                                             .controls[yAxis].controls
                                     );
                                     let i = index
                                 "
-                                cdkDrag
-                                style="display: flex; flex-flow: row"
+                                style="
+                                    display: grid;
+                                    grid-template-columns: 1fr repeat(
+                                            4,
+                                            max-content
+                                        );
+                                "
                             >
                                 <mat-form-field appearance="outline">
-                                    <mat-label>{{ y.value }}</mat-label>
+                                    <mat-label>{{
+                                        AXES[yAxis].name
+                                    }}</mat-label>
                                     <input
                                         matInput
                                         type="number"
                                         [formControlName]="i"
                                     />
                                 </mat-form-field>
-                                <div cdkDragHandle>DRAG</div>
-                                <div cdkDragHandle>ADD</div>
+                                <button mat-icon-button class="mt-17">
+                                    <i class="las la-arrow-down"></i>
+                                </button>
+                                <button mat-icon-button class="mt-17">
+                                    <i class="las la-arrow-up"></i>
+                                </button>
+                                <button mat-icon-button class="mt-17">
+                                    <i class="las la-plus"></i>
+                                </button>
+                                <button mat-icon-button class="mt-17">
+                                    <i class="las la-times"></i>
+                                </button>
                             </div>
                         </ng-container>
                     </ng-container>
@@ -190,3 +256,25 @@
         <button (click)="save()" mat-button>Save</button>
     </mat-toolbar>
 </div>
+
+<style>
+    form > div {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .las {
+        font-size: 1.7em;
+        height: 30px;
+        width: 30px;
+        margin-top: 4px;
+    }
+
+    .mt-17 {
+        margin-top: 10px;
+    }
+
+    .mat-divider {
+        margin: 5px 0px 25px 0px;
+    }
+</style>

@@ -73,7 +73,6 @@ export class Image {
     }
 
     public async load() {
-        console.log('loading', this.params.prompt)
         if (this.status === 'LOADED' || this.status === 'LOADING') return
 
         this.status = 'LOADING'

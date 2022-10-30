@@ -1,4 +1,3 @@
-import { DragDropModule } from '@angular/cdk/drag-drop'
 import { NgModule } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser'
 
@@ -18,13 +17,13 @@ import { MatToolbarModule } from '@angular/material/toolbar'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { StoreModule } from '@ngrx/store'
 import { StoreDevtoolsModule } from '@ngrx/store-devtools'
+import { ContextMenuModule } from '@perfectmemory/ngx-contextmenu'
 import { NgLetModule } from 'ng-let'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { GridSettingsComponent } from './grid/grid-settings/grid-settings.component'
 import { GridViewComponent } from './grid/grid-view/grid-view.component'
 import { gridFormReducer, gridReducer } from './grid/store'
-import { ContextMenuModule } from '@perfectmemory/ngx-contextmenu'
 
 @NgModule({
     declarations: [AppComponent, GridSettingsComponent, GridViewComponent],
@@ -43,7 +42,6 @@ import { ContextMenuModule } from '@perfectmemory/ngx-contextmenu'
         MatChipsModule,
         MatInputModule,
         MatIconModule,
-        DragDropModule,
         TextFieldModule,
         MatDividerModule,
         MatSelectModule,
