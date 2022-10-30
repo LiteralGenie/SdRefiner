@@ -20,7 +20,7 @@ import { Grid } from '../types'
 })
 export class GridSettingsComponent {
     loaded = false
-    activeGrid?: Grid
+    private activeGrid?: Grid
     formDiff: any = {
         baseParams: {},
         xAxis: {},
@@ -210,6 +210,12 @@ export class GridSettingsComponent {
 
     get AXES() {
         return AXES
+    }
+
+    get hasChanges(): boolean {
+        return Object.values(this.formDiff).some(
+            (obj) => Object.keys(obj as any).length > 0
+        )
     }
 
     getAxisDiff(type: 'xAxis' | 'yAxis'): Diff | undefined {

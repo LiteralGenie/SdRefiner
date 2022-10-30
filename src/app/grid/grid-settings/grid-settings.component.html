@@ -215,7 +215,7 @@
             <mat-checkbox [(ngModel)]="showDiffs">Show changes</mat-checkbox>
         </div>
         <div class="flex-row">
-            <button [disabled]="!activeGrid" (click)="reset()" mat-button>
+            <button [disabled]="!hasChanges" (click)="reset()" mat-button>
                 Reset
             </button>
             <button (click)="save()" mat-button>Save</button>
