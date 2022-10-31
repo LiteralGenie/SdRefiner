@@ -266,6 +266,12 @@ export class GridSettingsComponent {
         array.removeAt(currentIndex)
     }
 
+    onSizeInputBlur(formControlName: string) {
+        const control = this.gridForm.get('baseParams')!.get(formControlName)
+        const val = Math.round(control!.value / 64) * 64
+        control!.setValue(val)
+    }
+
     ngAfterViewInit() {
         // this.save()
     }

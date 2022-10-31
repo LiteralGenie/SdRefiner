@@ -101,9 +101,13 @@
                     >
                         <mat-label>Height</mat-label>
                         <input
+                            #input
+                            (blur)="onSizeInputBlur('height')"
                             formControlName="height"
                             matInput
                             type="number"
+                            min="0"
+                            step="64"
                         />
                         <mat-hint *ngIf="showDiffs">
                             <ng-container
@@ -122,7 +126,15 @@
                         [class.diff]="showDiffs"
                     >
                         <mat-label>Width</mat-label>
-                        <input formControlName="width" matInput type="number" />
+                        <input
+                            #input
+                            (blur)="onSizeInputBlur('width')"
+                            formControlName="width"
+                            matInput
+                            type="number"
+                            min="0"
+                            step="64"
+                        />
                         <mat-hint *ngIf="showDiffs">
                             <ng-container
                                 *ngTemplateOutlet="
