@@ -1,0 +1,36 @@
+<div
+    [formGroup]="form"
+    class="flex-row container"
+    style="justify-content: space-between"
+>
+    <mat-form-field appearance="outline">
+        <mat-label>Width</mat-label>
+        <input
+            (blur)="onInputBlur(0)"
+            formControlName="0"
+            #width
+            matInput
+            type="number"
+            min="0"
+            step="64"
+        />
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <mat-label>Height</mat-label>
+        <input
+            (blur)="onInputBlur(1)"
+            formControlName="1"
+            #height
+            matInput
+            type="number"
+            min="0"
+            step="64"
+        />
+    </mat-form-field>
+</div>
+
+<style>
+    .mat-form-field {
+        width: 125px;
+    }
+</style>

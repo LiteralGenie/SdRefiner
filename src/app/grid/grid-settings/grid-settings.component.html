@@ -99,32 +99,6 @@
                         appearance="outline"
                         [class.diff]="showDiffs"
                     >
-                        <mat-label>Height</mat-label>
-                        <input
-                            #input
-                            (blur)="onSizeInputBlur('height')"
-                            formControlName="height"
-                            matInput
-                            type="number"
-                            min="0"
-                            step="64"
-                        />
-                        <mat-hint *ngIf="showDiffs">
-                            <ng-container
-                                *ngTemplateOutlet="
-                                    hintTemplate;
-                                    context: {
-                                        diff: formDiff.baseParams.height
-                                    }
-                                "
-                            >
-                            </ng-container>
-                        </mat-hint>
-                    </mat-form-field>
-                    <mat-form-field
-                        appearance="outline"
-                        [class.diff]="showDiffs"
-                    >
                         <mat-label>Width</mat-label>
                         <input
                             #input
@@ -141,6 +115,32 @@
                                     hintTemplate;
                                     context: {
                                         diff: formDiff.baseParams.width
+                                    }
+                                "
+                            >
+                            </ng-container>
+                        </mat-hint>
+                    </mat-form-field>
+                    <mat-form-field
+                        appearance="outline"
+                        [class.diff]="showDiffs"
+                    >
+                        <mat-label>Height</mat-label>
+                        <input
+                            #input
+                            (blur)="onSizeInputBlur('height')"
+                            formControlName="height"
+                            matInput
+                            type="number"
+                            min="0"
+                            step="64"
+                        />
+                        <mat-hint *ngIf="showDiffs">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    hintTemplate;
+                                    context: {
+                                        diff: formDiff.baseParams.height
                                     }
                                 "
                             >
@@ -295,15 +295,96 @@
                             grid-template-columns: 1fr repeat(4, max-content);
                         "
                     >
-                        <mat-form-field appearance="outline">
-                            <mat-label>{{ $any(AXES)[axisId].name }}</mat-label>
-                            <input
-                                #input
-                                matInput
-                                type="number"
+                        <ng-container #input [ngSwitch]="axisId">
+                            <mat-form-field
+                                *ngSwitchCase="'prompt'"
+                                appearance="outline"
+                            >
+                                <mat-label>{{
+                                    $any(AXES)[axisId].name
+                                }}</mat-label>
+                                <input
+                                    matInput
+                                    type="text"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <mat-form-field
+                                *ngSwitchCase="'prompt_negative'"
+                                appearance="outline"
+                            >
+                                <mat-label>{{
+                                    $any(AXES)[axisId].name
+                                }}</mat-label>
+                                <input
+                                    matInput
+                                    type="text"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <mat-form-field
+                                *ngSwitchCase="'steps'"
+                                appearance="outline"
+                            >
+                                <mat-label>{{
+                                    $any(AXES)[axisId].name
+                                }}</mat-label>
+                                <input
+                                    matInput
+                                    type="number"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <mat-form-field
+                                *ngSwitchCase="'sampler'"
+                                appearance="outline"
+                            >
+                                <mat-label>{{
+                                    $any(AXES)[axisId].name
+                                }}</mat-label>
+                                <input
+                                    matInput
+                                    type="text"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <mat-form-field
+                                *ngSwitchCase="'cfg'"
+                                appearance="outline"
+                            >
+                                <mat-label>{{
+                                    $any(AXES)[axisId].name
+                                }}</mat-label>
+                                <input
+                                    matInput
+                                    type="number"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <mat-form-field
+                                *ngSwitchCase="'seed'"
+                                appearance="outline"
+                            >
+                                <mat-label>{{
+                                    $any(AXES)[axisId].name
+                                }}</mat-label>
+                                <input
+                                    matInput
+                                    type="number"
+                                    [formControlName]="i"
+                                />
+                            </mat-form-field>
+                            <app-rez-input
+                                *ngSwitchCase="'size'"
                                 [formControlName]="i"
-                            />
-                        </mat-form-field>
+                            ></app-rez-input>
+                            <div
+                                *ngSwitchDefault
+                                style="color: red; font-weight: bold"
+                            >
+                                UNKNOWN INPUT TYPE
+                            </div>
+                        </ng-container>
                         <button
                             #down
                             (click)="onAxisReorder(controlArray, i, i + 1)"

@@ -23,7 +23,7 @@ export const gridFormReducer = createReducer<GridForm>(
     {
         baseParams: DEFAULT_PARAMS,
         axisOptions: DEFAULT_AXIS_OPTIONS,
-        activeAxis: { x: 'steps', y: 'seed' },
+        activeAxis: { x: 'size', y: 'seed' },
     },
     on(updateGridForm, (state, form) => form)
 )

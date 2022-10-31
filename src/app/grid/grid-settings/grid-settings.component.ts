@@ -106,6 +106,7 @@ export class GridSettingsComponent {
                     )
                     control.addControl(name, ctrl, { emitEvent: false })
                 }
+                console.log('here', control)
             })
 
         this.gridForm.valueChanges.subscribe(this.updateStore.bind(this))
