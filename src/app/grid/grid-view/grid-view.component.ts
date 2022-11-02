@@ -83,8 +83,8 @@ export class GridViewComponent {
             .select(containerEl)
             .selectChild('svg')
             .selectChild('g')
-        const yAxis = d3.select(containerEl.children[2])
-        const xAxis = d3.select(containerEl.children[1])
+        const yAxis = d3.select(containerEl.children[2].children[0])
+        const xAxis = d3.select(containerEl.children[1].children[0])
 
         const zoomBehavior = d3.zoom().interpolate(d3.interpolate)
         d3.select(this.containerEl.nativeElement).call(zoomBehavior)

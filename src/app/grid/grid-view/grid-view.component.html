@@ -7,39 +7,69 @@
         grid-template-columns: max-content 1fr;
         overflow: hidden;
     "
+    class="container"
 >
     <!-- Top-left corner -->
-    <div></div>
+    <div
+        style="
+            z-index: 2;
+            border-right: 3px solid rgb(194, 24, 91);
+            border-bottom: 3px solid rgb(194, 24, 91);
+        "
+    ></div>
 
     <!-- Column titles -->
-    <div [style.overflow]="'visible'" [style.z-index]="1">
-        <div *ngIf="gridView$ | async as gridView" [style.display]="'flex'">
-            <div
-                *ngFor="let col of gridView.cols"
-                [style.width.px]="col.dim * scale"
-                [style.display]="'flex'"
-                [style.flex-flow]="'row'"
-                [style.justify-content]="'center'"
-                [style.font-size.rem]="1.5"
-            >
-                {{ col.title }}
+    <div
+        [style.overflow]="'visible'"
+        [style.z-index]="1"
+        style="
+            max-height: 150px;
+            overflow-wrap: anywhere;
+            border-bottom: 3px solid rgb(194, 24, 91);
+        "
+    >
+        <!-- This div is transform'd -->
+        <div style="overflow-y: hidden; max-height: 100%">
+            <div *ngIf="gridView$ | async as gridView" [style.display]="'flex'">
+                <div
+                    *ngFor="let col of gridView.cols"
+                    [style.width.px]="col.dim * scale"
+                    [style.justify-content]="'center'"
+                    [style.font-size.rem]="1.5"
+                    style="padding: 10px 0px"
+                    class="flex-row"
+                >
+                    {{ col.title }}
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Row Titles -->
-    <div [style.overflow]="'visible'" [style.z-index]="1">
-        <div *ngIf="gridView$ | async as gridView">
-            <div
-                *ngFor="let row of gridView.rows"
-                [style.height.px]="row.dim * scale"
-                [style.display]="'flex'"
-                [style.flex-flow]="'column'"
-                [style.justify-content]="'center'"
-                [style.font-size.rem]="1.5"
-            >
-                {{ row.title }}
-            </div>
+    <div
+        [style.overflow]="'visible'"
+        [style.z-index]="1"
+        class="flex-col"
+        style="
+            max-width: 150px;
+            overflow-wrap: anywhere;
+            border-right: 3px solid rgb(194, 24, 91);
+        "
+    >
+        <!-- This div is transform'd -->
+        <div style="overflow-x: hidden; max-width: 100%">
+            <ng-container *ngIf="gridView$ | async as gridView">
+                <div
+                    *ngFor="let row of gridView.rows"
+                    [style.height.px]="row.dim * scale"
+                    [style.justify-content]="'center'"
+                    [style.font-size.rem]="1.5"
+                    style="padding: 0px 10px"
+                    class="flex-col"
+                >
+                    {{ row.title }}
+                </div>
+            </ng-container>
         </div>
     </div>
 
@@ -84,3 +114,9 @@
         Disabled menu item
     </ng-template>
 </context-menu>
+
+<style>
+    .container > div {
+        background-color: #303030;
+    }
+</style>

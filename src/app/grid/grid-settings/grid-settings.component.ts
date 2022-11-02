@@ -274,7 +274,7 @@ export class GridSettingsComponent {
     }
 
     ngAfterViewInit() {
-        // this.save()
+        this.save()
     }
 
     private toGrid(): Grid {
