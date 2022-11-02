@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store'
 import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
 import { DataService, Image } from 'src/app/services/data.service'
+import { AxisInterface } from '../axis'
 import { selectGrid } from '../store'
 import { Grid } from '../types'
 
@@ -50,7 +51,13 @@ export class GridViewComponent {
                 return new Track(colWidths[i], colTitles[i])
             })
 
-            return new GridView(rowTracks, colTracks, images)
+            return new GridView(
+                rowTracks,
+                colTracks,
+                images,
+                grid.xAxis.name,
+                grid.yAxis.name
+            )
 
             function maxHeight(row: number, images: Image[][]): number {
                 return Math.max(
@@ -179,6 +186,25 @@ export class GridViewComponent {
         return images
     }
 
+    get status$() {
+        return this.gridView$.pipe(
+            map((gridView) => {
+                const numLoaded = gridView.images.reduce((total, row) => {
+                    return (
+                        total +
+                        row.filter((cell) => cell.status === 'LOADED').length
+                    )
+                }, 0)
+                const numCells = gridView.rows.length * gridView.cols.length
+
+                return {
+                    title: `${gridView.xTitle} vs ${gridView.yTitle}`,
+                    loaded: `${numLoaded} of ${numCells} loaded`,
+                }
+            })
+        )
+    }
+
     setZoom(scale: number, x: number, y: number, duration = 0) {
         const containerEl = this.containerEl.nativeElement
         d3.select(containerEl)
@@ -206,7 +232,9 @@ class GridView {
     constructor(
         public rows: Track[],
         public cols: Track[],
-        public images: Image[][]
+        public images: Image[][],
+        public xTitle: string,
+        public yTitle: string
     ) {}
 
     cellAt(row: number, col: number) {

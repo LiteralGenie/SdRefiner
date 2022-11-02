@@ -36,7 +36,7 @@
                     [style.width.px]="(col.dim + padding) * scale"
                     [style.justify-content]="'center'"
                     [style.font-size.rem]="1.2"
-                    style="padding-top: 10px 0px"
+                    style="padding: 10px 0px"
                     class="flex-row"
                 >
                     {{ col.title }}
@@ -101,7 +101,20 @@
 </div>
 
 <mat-toolbar class="flex-row" style="justify-content: space-between">
-    <div></div>
+    <div class="flex-row" style="font-size: 14px; align-items: center">
+        <ng-container *ngIf="status$ | async as status">
+            {{ status.title }}
+            <div
+                style="
+                    width: 1px;
+                    background-color: white;
+                    margin: 0px 10px;
+                    height: 20px;
+                "
+            ></div>
+            {{ status.loaded }}
+        </ng-container>
+    </div>
     <div class="flex-row" style="align-items: center">
         <mat-form-field class="zoom-field">
             <input
@@ -141,13 +154,11 @@
 
     .no-spinner-buttons::-webkit-outer-spin-button,
     .no-spinner-buttons::-webkit-inner-spin-button {
-        /* display: none; <- Crashes Chrome on hover */
         -webkit-appearance: none;
-        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+        margin: 0;
     }
-
     .no-spinner-buttons[type="number"] {
-        -moz-appearance: textfield; /* Firefox */
+        -moz-appearance: textfield;
     }
 
     ::ng-deep .zoom-field .mat-form-field-infix {
