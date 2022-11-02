@@ -2,7 +2,7 @@
     #containerEl
     style="
         display: grid;
-        height: 100%;
+        height: calc(100% - 64px);
         grid-template-rows: max-content 1fr;
         grid-template-columns: max-content 1fr;
         overflow: hidden;
@@ -35,7 +35,7 @@
                     *ngFor="let col of gridView.cols"
                     [style.width.px]="col.dim * scale"
                     [style.justify-content]="'center'"
-                    [style.font-size.rem]="1.5"
+                    [style.font-size.rem]="1.2"
                     style="padding: 10px 0px"
                     class="flex-row"
                 >
@@ -63,7 +63,7 @@
                     *ngFor="let row of gridView.rows"
                     [style.height.px]="row.dim * scale"
                     [style.justify-content]="'center'"
-                    [style.font-size.rem]="1.5"
+                    [style.font-size.rem]="1.2"
                     style="padding: 0px 10px"
                     class="flex-col"
                 >
@@ -100,6 +100,25 @@
     </svg>
 </div>
 
+<mat-toolbar class="flex-row" style="justify-content: space-between">
+    <div></div>
+    <div class="flex-row" style="align-items: center">
+        <mat-form-field class="zoom-field">
+            <input
+                class="no-spinner-buttons"
+                matInput
+                [ngModel]="(scale * 100).toFixed(0)"
+                (ngModelChange)="scale = $event / 100"
+                type="number"
+                step="5"
+                min="0"
+            />
+            <span matSuffix>%</span>
+        </mat-form-field>
+        <button mat-button (click)="setZoom(1, 0, 0, 500)">(R)eset</button>
+    </div>
+</mat-toolbar>
+
 <context-menu #contextMenu menuClass="context-menu">
     <ng-template contextMenuItem [passive]="true">
         <span class="menu-item-title">Context menu title</span>
@@ -118,5 +137,46 @@
 <style>
     .container > div {
         background-color: #303030;
+    }
+
+    .no-spinner-buttons::-webkit-outer-spin-button,
+    .no-spinner-buttons::-webkit-inner-spin-button {
+        /* display: none; <- Crashes Chrome on hover */
+        -webkit-appearance: none;
+        margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+    }
+
+    .no-spinner-buttons[type="number"] {
+        -moz-appearance: textfield; /* Firefox */
+    }
+
+    ::ng-deep .zoom-field .mat-form-field-infix {
+        border-top: 0;
+        padding: 0;
+    }
+    ::ng-deep .zoom-field .mat-form-field-wrapper {
+        padding: 0;
+    }
+    ::ng-deep .zoom-field .mat-form-field-underline {
+        display: none;
+    }
+    ::ng-deep .mat-form-field-underline {
+        display: none;
+    }
+    ::ng-deep .zoom-field .mat-form-field-suffix {
+        margin-left: 2px;
+    }
+    ::ng-deep .zoom-field input {
+        text-align: right;
+    }
+    ::ng-deep .zoom-field {
+        font-size: 14px;
+        font-weight: bold;
+        width: 45px;
+    }
+
+    ::ng-deep .zoom-button .mat-button-wrapper > i {
+        font-size: 1.2em;
+        margin-top: -4px;
     }
 </style>

@@ -77,6 +77,7 @@ export class GridViewComponent {
         this.grid$.subscribe(this.loadGrid.bind(this))
     }
 
+    private zoomBehavior = d3.zoom()
     ngAfterViewInit() {
         const containerEl = this.containerEl.nativeElement
         const imGrid = d3
@@ -86,21 +87,28 @@ export class GridViewComponent {
         const yAxis = d3.select(containerEl.children[2].children[0])
         const xAxis = d3.select(containerEl.children[1].children[0])
 
-        const zoomBehavior = d3.zoom().interpolate(d3.interpolate)
+        const zoomBehavior = this.zoomBehavior.interpolate(d3.interpolate)
         d3.select(this.containerEl.nativeElement).call(zoomBehavior)
 
-        zoomBehavior.on('zoom', ({ transform: tfm }) => {
-            imGrid.attr('transform', tfm.toString())
+        zoomBehavior.on('zoom', ({ transform: { k, x, y } }) => {
+            const imGrid = d3
+                .select(containerEl)
+                .selectChild('svg')
+                .selectChild('g')
+            const yAxis = d3.select(containerEl.children[2].children[0])
+            const xAxis = d3.select(containerEl.children[1].children[0])
+
+            imGrid.attr('transform', `translate(${x}, ${y}) scale(${k})`)
 
             yAxis
-                .style('transform', `translate(0, ${tfm.y}px)`)
+                .style('transform', `translate(0, ${y}px)`)
                 .style('transform-origin', '0 0')
 
             xAxis
-                .style('transform', `translate(${tfm.x}px, 0)`)
+                .style('transform', `translate(${x}px, 0)`)
                 .style('transform-origin', '0 0')
 
-            this.scale = tfm.k
+            this.scale = k
         })
 
         zoomBehavior.on('end', ({ sourceEvent, transform: tfm }) => {
@@ -169,6 +177,26 @@ export class GridViewComponent {
         })
 
         return images
+    }
+
+    setZoom(scale: number, x: number, y: number, duration = 0) {
+        const containerEl = this.containerEl.nativeElement
+        d3.select(containerEl)
+            .transition()
+            .duration(duration)
+            .call(
+                this.zoomBehavior.transform,
+                d3.zoomIdentity.scale(scale).translate(x, y)
+            )
+    }
+
+    @HostListener('window:keydown.r', ['$event'])
+    onKeydownR(ev: KeyboardEvent) {
+        const tgt = ev.target as HTMLElement
+        if (tgt === document.body || tgt.nodeName === 'image') {
+            this.setZoom(1, 0, 0, 500)
+            ev.preventDefault()
+        } else console.log(ev)
     }
 
     constructor(private store: Store, private ds: DataService) {}
