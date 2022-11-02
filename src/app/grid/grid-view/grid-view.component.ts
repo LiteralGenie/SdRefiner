@@ -14,7 +14,7 @@ import { Grid } from '../types'
 export class GridViewComponent {
     @ViewChild('containerEl') containerEl!: ElementRef<Element>
     scale = 1
-    isPressingSpace = false
+    padding = 30
 
     private grid$ = this.store.select(selectGrid).pipe(
         filter((grid) => !!grid),
@@ -117,11 +117,11 @@ export class GridViewComponent {
 
                 const gridHeight = gridView.rows.reduce(
                     (total, track) => total + track.dim,
-                    0
+                    this.padding * gridView.rows.length
                 )
                 const gridWidth = gridView.cols.reduce(
                     (total, track) => total + track.dim,
-                    0
+                    this.padding * gridView.cols.length
                 )
 
                 const vpHeight = containerEl.clientHeight
@@ -145,7 +145,7 @@ export class GridViewComponent {
                 if (tgtX !== undefined || tgtY !== undefined) {
                     d3.select(containerEl)
                         .transition()
-                        .duration(750)
+                        .duration(350)
                         .call(
                             zoomBehavior.transform,
                             d3.zoomIdentity
@@ -200,9 +200,6 @@ export class GridViewComponent {
     }
 
     constructor(private store: Store, private ds: DataService) {}
-
-    /* prettier-ignore */ @HostListener('document:keydown.space') onSpaceDown() { this.isPressingSpace = true }
-    /* prettier-ignore */ @HostListener('document:keyup.space') onSpaceUp() { this.isPressingSpace = false }
 }
 
 class GridView {

@@ -32,11 +32,11 @@
         <div style="overflow-y: hidden; max-height: 100%">
             <div *ngIf="gridView$ | async as gridView" [style.display]="'flex'">
                 <div
-                    *ngFor="let col of gridView.cols"
-                    [style.width.px]="col.dim * scale"
+                    *ngFor="let col of gridView.cols; index as c"
+                    [style.width.px]="(col.dim + padding) * scale"
                     [style.justify-content]="'center'"
                     [style.font-size.rem]="1.2"
-                    style="padding: 10px 0px"
+                    style="padding-top: 10px 0px"
                     class="flex-row"
                 >
                     {{ col.title }}
@@ -60,8 +60,8 @@
         <div style="overflow-x: hidden; max-width: 100%">
             <ng-container *ngIf="gridView$ | async as gridView">
                 <div
-                    *ngFor="let row of gridView.rows"
-                    [style.height.px]="row.dim * scale"
+                    *ngFor="let row of gridView.rows; index as r"
+                    [style.height.px]="(row.dim + padding) * scale"
                     [style.justify-content]="'center'"
                     [style.font-size.rem]="1.2"
                     style="padding: 0px 10px"
@@ -87,8 +87,8 @@
                             *ngLet="gridView.cellAt(r, c) as cell"
                             [attr.height]="cell.height"
                             [attr.width]="cell.width"
-                            [attr.x]="cell.x"
-                            [attr.y]="cell.y"
+                            [attr.x]="cell.x + padding * (c + 1)"
+                            [attr.y]="cell.y + padding * (r + 1)"
                             [attr.href]="cell.image.data"
                             [contextMenu]="contextMenu"
                             contextMenuValue="value"
