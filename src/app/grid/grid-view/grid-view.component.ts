@@ -22,6 +22,7 @@ import { Grid } from '../types'
 })
 export class GridViewComponent {
     @ViewChild('containerEl') containerEl!: ElementRef<Element>
+    @ViewChild('contextMenu') contextMenu!: any
     scale = 1
     padding = 30
 
@@ -107,6 +108,8 @@ export class GridViewComponent {
         d3.select(this.containerEl.nativeElement).call(zoomBehavior)
 
         zoomBehavior.on('zoom', ({ transform: { k, x, y } }) => {
+            this.closeContextMenu()
+
             const imGrid = d3
                 .select(containerEl)
                 .selectChild('svg')
@@ -240,6 +243,10 @@ export class GridViewComponent {
         )
     }
 
+    closeContextMenu(): void {
+        this.contextMenu.contextMenuStack.closeAll()
+    }
+
     setZoom(scale: number, x: number, y: number, duration = 0) {
         const containerEl = this.containerEl.nativeElement
         d3.select(containerEl)
@@ -254,11 +261,10 @@ export class GridViewComponent {
     @HostListener('window:keydown.r', ['$event'])
     onKeydownR(ev: KeyboardEvent) {
         const tgt = ev.target as HTMLElement
-        if (tgt === document.body || tgt.nodeName === 'image') {
+        if (tgt.nodeName !== 'TEXTAREA' && tgt.nodeName !== 'INPUT') {
             this.setZoom(1, 0, 0, 500)
             ev.preventDefault()
-            console.log(ev)
-        }
+        } else console.log(ev)
     }
 
     getSpinnerPosition(image: HTMLElement): { x: number; y: number } {

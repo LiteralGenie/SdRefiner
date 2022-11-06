@@ -145,14 +145,18 @@
                         >
                             <!-- Outline -->
                             <rect
-                                [attr.height]="cell.height"
-                                [attr.width]="cell.width"
-                                [attr.x]="cell.x + padding * (c + 1)"
-                                [attr.y]="cell.y + padding * (r + 1)"
+                                [attr.height]="cell.height + padding / 5"
+                                [attr.width]="cell.width + padding / 5"
+                                [attr.x]="
+                                    cell.x + padding * (c + 1) - padding / 10
+                                "
+                                [attr.y]="
+                                    cell.y + padding * (r + 1) - padding / 10
+                                "
                                 [attr.href]="cell.image.data"
                                 stroke="black"
                                 fill="#202020"
-                                stroke-width="padding / 2"
+                                stroke-width="padding / 2 + padding/10"
                             ></rect>
 
                             <!-- Spinner -->
