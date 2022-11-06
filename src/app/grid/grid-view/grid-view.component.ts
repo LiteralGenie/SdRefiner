@@ -4,6 +4,7 @@ import {
     Component,
     ElementRef,
     HostListener,
+    Input,
     ViewChild,
 } from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
@@ -12,7 +13,8 @@ import { ContextMenuComponent } from '@perfectmemory/ngx-contextmenu'
 import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
 import { DataService, Image } from 'src/app/services/data.service'
-import { selectGrid } from '../store'
+import { GridSettingsService } from '../grid-settings/grid-settings.service'
+import { selectGrid, selectGridForm, updateGridForm } from '../store'
 import { Grid } from '../types'
 
 @Component({
@@ -21,12 +23,16 @@ import { Grid } from '../types'
     styleUrls: ['./grid-view.component.scss'],
 })
 export class GridViewComponent {
+    @Input() onSettingsUpdate!: () => void
+
     @ViewChild('containerEl') containerEl!: ElementRef<Element>
     @ViewChild('contextMenu') contextMenu!: any
+
     scale = 1
     padding = 30
 
     private grid$ = this.store.select(selectGrid).pipe(
+        tap(() => console.log('here')),
         filter((grid) => !!grid),
         share()
     )
@@ -208,7 +214,7 @@ export class GridViewComponent {
     }
 
     onCtxMenuOpen(menu: ContextMenuComponent<any>): void {
-        const image: Image = menu!.value
+        const image: Image = menu!.value.image
         const copyImageOption = menu.menuItems.get(0)
         const loadOption = menu.menuItems.get(2)
 
@@ -218,10 +224,22 @@ export class GridViewComponent {
         this.cdr.detectChanges()
     }
 
-    async onLoadImage($event: any) {
-        const image: Image = $event.value
+    onLoadImage($event: any) {
+        const image: Image = $event.value.image
         image.load()
         this.cdr.detectChanges()
+    }
+
+    onSettingsExport($event: any) {
+        const image: Image = $event.value.image
+
+        this.gridSettingsService.gridForm = {
+            ...this.gridSettingsService.gridForm,
+            baseParams: image.params,
+        }
+        this.gridSettingsService.reload$.next(null)
+
+        this.onSettingsUpdate()
     }
 
     get status$() {
@@ -286,7 +304,8 @@ export class GridViewComponent {
         private ds: DataService,
         private snackBar: MatSnackBar,
         private platform: Platform,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private gridSettingsService: GridSettingsService
     ) {}
 }
 

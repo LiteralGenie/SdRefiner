@@ -25,7 +25,7 @@ export const gridFormReducer = createReducer<GridForm>(
         axisOptions: DEFAULT_AXIS_OPTIONS,
         activeAxis: { x: 'size', y: 'seed' },
     },
-    on(updateGridForm, (state, form) => form)
+    on(updateGridForm, (state, form) => JSON.parse(JSON.stringify(form)))
 )
 
 /** Selectors */

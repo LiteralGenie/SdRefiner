@@ -141,7 +141,10 @@
                         <g
                             *ngLet="gridView.cellAt(r, c) as cell"
                             [contextMenu]="contextMenu"
-                            [contextMenuValue]="cell.image"
+                            [contextMenuValue]="{
+                                image: cell.image,
+                                gridView: gridView
+                            }"
                         >
                             <!-- Outline -->
                             <rect
@@ -230,7 +233,9 @@
     <ng-template contextMenuItem let-value (execute)="onCopyImage($any(null))"
         >Copy image</ng-template
     >
-    <ng-template contextMenuItem>Use as base</ng-template>
+    <ng-template contextMenuItem (execute)="onSettingsExport($event)"
+        >Use as base</ng-template
+    >
     <ng-template contextMenuItem let-value (execute)="onLoadImage($event)"
         >Load</ng-template
     >

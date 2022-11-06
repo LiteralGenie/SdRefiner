@@ -12,10 +12,12 @@ import {
     combineLatest,
     concat,
     EMPTY,
+    exhaustMap,
     filter,
     of,
     pairwise,
     Subscription,
+    take,
 } from 'rxjs'
 import { AXES, AxisId } from '../axis'
 import {
@@ -24,7 +26,8 @@ import {
     selectGridForm,
     updateGridForm,
 } from '../store'
-import { Grid } from '../types'
+import { Grid, GridForm } from '../types'
+import { GridSettingsService } from './grid-settings.service'
 
 @Component({
     selector: 'app-grid-settings',
@@ -65,12 +68,15 @@ export class GridSettingsComponent {
         axisOptions: new FormGroup({} as any),
     })
 
-    constructor(private store: Store, private cdf: ChangeDetectorRef) {}
+    constructor(
+        private store: Store,
+        private cdr: ChangeDetectorRef,
+        private gridSettingsService: GridSettingsService
+    ) {}
 
     ngOnInit() {
         // Update form if another component edits form
-        this.subGridForm = this.store
-            .select(selectGridForm)
+        this.subGridForm = this.gridSettingsService.reload$
             .pipe(
                 filter(() => {
                     if (this.ignoreUpdate) {
@@ -81,8 +87,10 @@ export class GridSettingsComponent {
                     }
                 })
             )
-            .subscribe((gridForm) => {
-                gridForm = JSON.parse(JSON.stringify(gridForm))
+            .subscribe((gridForm: GridForm) => {
+                gridForm = JSON.parse(
+                    JSON.stringify(this.gridSettingsService.gridForm)
+                )
                 this.loaded = true
 
                 // Update base params
@@ -96,19 +104,21 @@ export class GridSettingsComponent {
                 )
 
                 // Update axis options
-                const control = this.gridForm.get('axisOptions') as FormGroup
-                for (let name of Object.keys(control.controls)) {
-                    control.removeControl(name, { emitEvent: false })
+                const axisOptions = this.gridForm.get(
+                    'axisOptions'
+                ) as FormGroup
+                for (let name of Object.keys(axisOptions.controls)) {
+                    axisOptions.removeControl(name, { emitEvent: false })
                 }
                 for (let name of Object.keys(gridForm.axisOptions)) {
                     const value = gridForm.axisOptions[name as AxisId]
                     const ctrl = new FormArray(
                         value.map((x) => new FormControl(x))
                     )
-                    control.addControl(name, ctrl, { emitEvent: false })
+                    axisOptions.addControl(name, ctrl, { emitEvent: false })
                 }
-                console.log('here', control)
             })
+        this.gridSettingsService.reload$.next(null)
 
         this.gridForm.valueChanges.subscribe(this.updateStore.bind(this))
 
@@ -155,8 +165,8 @@ export class GridSettingsComponent {
                 }
             })
 
-        xAxis!.valueChanges.subscribe(() => this.cdf.markForCheck())
-        yAxis!.valueChanges.subscribe(() => this.cdf.markForCheck())
+        xAxis!.valueChanges.subscribe(() => this.cdr.markForCheck())
+        yAxis!.valueChanges.subscribe(() => this.cdr.markForCheck())
     }
 
     ngOnDestroy() {
@@ -168,19 +178,16 @@ export class GridSettingsComponent {
     private updateStore(
         form?: GridSettingsComponent['gridForm']['value']
     ): void {
-        this.ignoreUpdate = true
-
         form = form || this.gridForm.value
-        this.store.dispatch(
-            updateGridForm({
-                baseParams: form.baseParams as any,
-                axisOptions: JSON.parse(JSON.stringify(form.axisOptions)),
-                activeAxis: {
-                    x: form.xAxis as AxisId,
-                    y: form.yAxis as AxisId,
-                },
-            })
-        )
+        this.gridSettingsService.gridForm = {
+            baseParams: form.baseParams as any,
+            axisOptions: JSON.parse(JSON.stringify(form.axisOptions)),
+            activeAxis: {
+                x: form.xAxis as AxisId,
+                y: form.yAxis as AxisId,
+            },
+        }
+        this.gridSettingsService.reload$.next(null)
     }
 
     save() {

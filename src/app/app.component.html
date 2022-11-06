@@ -16,7 +16,10 @@
             </button>
         </mat-toolbar>
         <div [style.height]="'calc(100% - 64px)'">
-            <app-grid-view [style.height.%]="100"></app-grid-view>
+            <app-grid-view
+                [style.height.%]="100"
+                [onSettingsUpdate]="drawer.open.bind(drawer)"
+            ></app-grid-view>
         </div>
     </mat-drawer-content>
 </mat-drawer-container>
