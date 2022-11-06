@@ -1,14 +1,11 @@
-<div
-    [formGroup]="form"
-    class="flex-row container"
-    style="justify-content: space-between"
->
+<div class="flex-row container" style="justify-content: space-between">
     <mat-form-field appearance="outline">
         <mat-label>Width</mat-label>
         <input
-            (blur)="onInputBlur(0)"
-            formControlName="0"
-            #width
+            #input
+            [ngModel]="width"
+            (ngModelChange)="setWidth($event)"
+            (blur)="onInputBlur(input.value, 'width')"
             matInput
             type="number"
             min="0"
@@ -18,9 +15,10 @@
     <mat-form-field appearance="outline">
         <mat-label>Height</mat-label>
         <input
-            (blur)="onInputBlur(1)"
-            formControlName="1"
-            #height
+            #input
+            [ngModel]="height"
+            (ngModelChange)="setHeight($event)"
+            (blur)="onInputBlur(input.value, 'height')"
             matInput
             type="number"
             min="0"

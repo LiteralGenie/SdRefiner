@@ -376,7 +376,7 @@
                             </mat-form-field>
                             <app-rez-input
                                 *ngSwitchCase="'size'"
-                                [formControlName]="i"
+                                [control]="controlArray.controls[i]"
                             ></app-rez-input>
                             <div
                                 *ngSwitchDefault

@@ -1,13 +1,5 @@
-import { Component, ElementRef, HostBinding, Input } from '@angular/core'
-import {
-    ControlValueAccessor,
-    FormControl,
-    FormGroup,
-    NG_VALUE_ACCESSOR,
-} from '@angular/forms'
-import { Subject } from 'rxjs'
-
-type Resolution = [number | null, number | null]
+import { Component, ElementRef, Input } from '@angular/core'
+import { AbstractControl, NG_VALUE_ACCESSOR } from '@angular/forms'
 
 @Component({
     selector: 'app-rez-input',
@@ -21,109 +13,18 @@ type Resolution = [number | null, number | null]
         },
     ],
 })
-export class RezInputComponent implements ControlValueAccessor {
-    form = new FormGroup({
-        0: new FormControl(null as Resolution[number]),
-        1: new FormControl(null as Resolution[number]),
-    })
+export class RezInputComponent {
+    @Input() control?: AbstractControl
 
-    onInputBlur(formControlName: 0 | 1) {
-        const control = this.form.controls[formControlName]
-        const val = Math.round((control.value as number) / 64) * 64
-        control.setValue(val)
-    }
+    onInputBlur(inputVal: string, type: 'width' | 'height') {
+        const currentVal = parseInt(inputVal) as number
+        const newVal = Math.round(currentVal / 64) * 64
 
-    stateChanges = new Subject<void>()
-    @Input()
-    public get value(): Resolution {
-        const formVal = this.form.value as Resolution
-        return [formVal[0], formVal[1]]
+        if (type === 'width') this.width = newVal
+        else this.height = newVal
     }
-    public set value(val: Resolution) {
-        this.form.setValue(val)
-        this.stateChanges.next()
-    }
-
-    ngOnDestroy() {
-        this.stateChanges.complete()
-    }
-
-    static id = 0
-    @HostBinding() id = `rez-input-${RezInputComponent.id++}`
-
-    @Input()
-    get placeholder(): string {
-        return this._placeholder
-    }
-    set placeholder(plh) {
-        this._placeholder = plh
-        this.stateChanges.next()
-    }
-    private _placeholder = 'wtf'
 
     constructor(private elementRef: ElementRef) {}
-
-    focused = false
-    touched = false
-    onTouched = () => {}
-    onFocusIn(event: FocusEvent) {
-        if (!this.focused) {
-            this.focused = true
-            this.stateChanges.next()
-        }
-    }
-    onFocusOut(event: FocusEvent) {
-        if (
-            !this.elementRef.nativeElement.contains(
-                event.relatedTarget as Element
-            )
-        ) {
-            this.touched = true
-            this.focused = false
-            this.onTouched()
-            this.stateChanges.next()
-        }
-    }
-
-    get empty() {
-        return this.value.includes(null)
-    }
-
-    @HostBinding('class.floating')
-    get shouldLabelFloat() {
-        return this.value.filter((dim) => dim !== null).length > 0
-    }
-
-    @Input()
-    get disabled(): boolean {
-        return this._disabled
-    }
-    set disabled(value: boolean) {
-        this._disabled = !!value
-        this._disabled ? this.form.disable() : this.form.enable()
-        this.stateChanges.next()
-    }
-    private _disabled = false
-
-    get errorState(): boolean {
-        return this.form.invalid && this.touched
-    }
-
-    @Input()
-    get required() {
-        return this._required
-    }
-    set required(req) {
-        this._required = !!req
-        this.stateChanges.next()
-    }
-    private _required = false
-
-    setDescribedByIds(ids: string[]) {
-        const controlElement =
-            this.elementRef.nativeElement.querySelector('.container')!
-        controlElement.setAttribute('aria-describedby', ids.join(' '))
-    }
 
     onContainerClick(event: MouseEvent) {
         if ((event.target as Element).tagName.toLowerCase() != 'input') {
@@ -139,17 +40,27 @@ export class RezInputComponent implements ControlValueAccessor {
         }
     }
 
-    onChange = () => {}
-    writeValue(val: Resolution | null): void {
-        this.value = val || [null, null]
+    width = -1
+    setWidth(val: number) {
+        this.width = val
+
+        const controlVal = [...this.control?.value] || [this.width, this.height]
+        controlVal[0] = val
+        this.control?.setValue(controlVal)
     }
-    registerOnChange(fn: any): void {
-        this.onChange = fn
+
+    height = -1
+    setHeight(val: number) {
+        this.height = val
+
+        const controlVal = [...this.control?.value] || [this.width, this.height]
+        controlVal[1] = val
+        this.control?.setValue(controlVal)
     }
-    registerOnTouched(fn: any): void {
-        this.onTouched = fn
-    }
-    setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled
+
+    ngAfterViewInit() {
+        const controlVal = this.control!.value
+        this.setWidth(controlVal[0])
+        this.setHeight(controlVal[1])
     }
 }
