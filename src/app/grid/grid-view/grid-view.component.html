@@ -86,7 +86,6 @@
                 stroke: #303030;
                 stroke-width: 0.5px;
                 z-index: 25;
-                transform: translate(-36px, -36px) scale(3);
             }
         </style>
 
@@ -148,27 +147,26 @@
                         >
                             <!-- Outline -->
                             <rect
-                                [attr.height]="cell.height + padding / 5"
-                                [attr.width]="cell.width + padding / 5"
-                                [attr.x]="
-                                    cell.x + padding * (c + 1) - padding / 10
-                                "
-                                [attr.y]="
-                                    cell.y + padding * (r + 1) - padding / 10
-                                "
+                                #container
+                                *ngLet="getContainerPosition(cell, r, c) as pos"
+                                [attr.height]="pos.height"
+                                [attr.width]="pos.width"
+                                [attr.x]="pos.x"
+                                [attr.y]="pos.y"
                                 [attr.href]="cell.image.data"
                                 stroke="black"
                                 fill="#202020"
-                                stroke-width="padding / 2 + padding/10"
+                                [stroke-width]="padding / 2"
                             ></rect>
 
                             <!-- Spinner -->
                             <g *ngIf="cell.image.status === 'LOADING'">
                                 <use
                                     xlink:href="#spinner"
-                                    *ngIf="getSpinnerPosition(image) as pos"
-                                    [attr.x]="pos.x"
-                                    [attr.y]="pos.y"
+                                    *ngLet="
+                                        getSpinnerPosition(cell, r, c) as tfm
+                                    "
+                                    [style.transform]="tfm"
                                 />
                             </g>
 

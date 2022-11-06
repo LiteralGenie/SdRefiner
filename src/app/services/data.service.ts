@@ -3,15 +3,11 @@ import { Injectable } from '@angular/core'
 import {
     concat,
     concatMap,
-    defer,
     EMPTY,
     firstValueFrom,
     from,
-    map,
     of,
     Subscription,
-    switchMap,
-    tap,
 } from 'rxjs'
 
 const API_URL = 'http://localhost:8860'

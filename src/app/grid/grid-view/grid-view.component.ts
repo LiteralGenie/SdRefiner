@@ -14,7 +14,7 @@ import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
 import { DataService, Image } from 'src/app/services/data.service'
 import { GridSettingsService } from '../grid-settings/grid-settings.service'
-import { selectGrid, selectGridForm, updateGridForm } from '../store'
+import { selectGrid } from '../store'
 import { Grid } from '../types'
 
 @Component({
@@ -30,9 +30,10 @@ export class GridViewComponent {
 
     scale = 1
     padding = 30
+    private spinnerSize = 24
+    private spinnerScale = 4
 
     private grid$ = this.store.select(selectGrid).pipe(
-        tap(() => console.log('here')),
         filter((grid) => !!grid),
         share()
     )
@@ -44,11 +45,11 @@ export class GridViewComponent {
             // Dims
             const rowHeights = images
                 .map((_, i) => maxHeight(i, images))
-                .map((val) => val * this.scale)
+                .map((val) => val)
 
             const colWidths = images
                 .map((_, i) => maxWidth(i, images))
-                .map((val) => val * this.scale)
+                .map((val) => val)
 
             // Titles
             const rowTitles = grid.yValues.map((val) =>
@@ -103,12 +104,6 @@ export class GridViewComponent {
     private zoomBehavior = d3.zoom()
     ngAfterViewInit() {
         const containerEl = this.containerEl.nativeElement
-        const imGrid = d3
-            .select(containerEl)
-            .selectChild('svg')
-            .selectChild('g')
-        const yAxis = d3.select(containerEl.children[2].children[0])
-        const xAxis = d3.select(containerEl.children[1].children[0])
 
         const zoomBehavior = this.zoomBehavior.interpolate(d3.interpolate)
         d3.select(this.containerEl.nativeElement).call(zoomBehavior)
@@ -285,18 +280,37 @@ export class GridViewComponent {
         } else console.log(ev)
     }
 
-    getSpinnerPosition(image: HTMLElement): { x: number; y: number } {
-        const attrs = image.attributes
-        const x = parseInt(attrs.getNamedItem('x')!.value)
-        const y = parseInt(attrs.getNamedItem('y')!.value)
-        const width = parseInt(attrs.getNamedItem('width')!.value)
-        const height = parseInt(attrs.getNamedItem('height')!.value)
+    getContainerPosition(cell: Cell, idxRow: number, idxCol: number) {
+        const { width: imWidth, height: imHeight } = cell.image.params
+        const {
+            x: cellX,
+            y: cellY,
+            width: cellWidth,
+            height: cellHeight,
+        } = cell
+        const remWidth = cellWidth - imWidth
+        const remHeight = cellHeight - imHeight
+        const padX = this.padding * (idxCol + 1)
+        const padY = this.padding * (idxRow + 1)
 
-        const result = {
-            x: x + width / 2,
-            y: y + height / 2,
+        return {
+            x: cellX + padX + remWidth / 2,
+            y: cellY + padY + remHeight / 2,
+            width: imWidth,
+            height: imHeight,
         }
-        return result
+    }
+
+    getSpinnerPosition(cell: Cell, idxRow: number, idxCol: number): string {
+        const containerPos = this.getContainerPosition(cell, idxRow, idxCol)
+
+        const centerX = containerPos.x + containerPos.width / 2
+        const centerY = containerPos.y + containerPos.height / 2
+        const scaleOffset = (this.spinnerScale * this.spinnerSize) / 2
+
+        return `translate(${centerX - scaleOffset}px, ${
+            centerY - scaleOffset
+        }px) scale(${this.spinnerScale})`
     }
 
     constructor(
@@ -309,6 +323,14 @@ export class GridViewComponent {
     ) {}
 }
 
+type Cell = {
+    height: number
+    width: number
+    x: number
+    y: number
+    image: Image
+}
+
 class GridView {
     constructor(
         public rows: Track[],
@@ -318,7 +340,7 @@ class GridView {
         public yTitle: string
     ) {}
 
-    cellAt(row: number, col: number) {
+    cellAt(row: number, col: number): Cell {
         const rowTrk = this.rows[row]
         const colTrk = this.cols[col]
         const x = this.cols
