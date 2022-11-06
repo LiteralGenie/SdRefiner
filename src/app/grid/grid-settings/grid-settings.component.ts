@@ -12,20 +12,13 @@ import {
     combineLatest,
     concat,
     EMPTY,
-    exhaustMap,
     filter,
     of,
     pairwise,
     Subscription,
-    take,
 } from 'rxjs'
 import { AXES, AxisId } from '../axis'
-import {
-    createGrid,
-    selectGrid,
-    selectGridForm,
-    updateGridForm,
-} from '../store'
+import { createGrid, selectGrid, selectGridForm } from '../store'
 import { Grid, GridForm } from '../types'
 import { GridSettingsService } from './grid-settings.service'
 
@@ -178,6 +171,8 @@ export class GridSettingsComponent {
     private updateStore(
         form?: GridSettingsComponent['gridForm']['value']
     ): void {
+        this.ignoreUpdate = true
+
         form = form || this.gridForm.value
         this.gridSettingsService.gridForm = {
             baseParams: form.baseParams as any,
