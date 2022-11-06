@@ -65,10 +65,16 @@ export class Image {
     constructor(private ds: DataService, public readonly params: ImageParams) {}
 
     public async loadCached(): Promise<boolean> {
+        this.status = 'LOADING'
+
         const response = await this.ds.getImageCached(this.params)
-        if (!response) return false
+        if (!response) {
+            this.status = 'IDLE'
+            return false
+        }
 
         this.data = response
+        this.status = 'LOADED'
         return true
     }
 

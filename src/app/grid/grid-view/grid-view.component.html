@@ -138,17 +138,24 @@
             <g *ngIf="gridView$ | async as gridView">
                 <g *ngFor="let row of gridView.rows; index as r">
                     <g *ngFor="let col of gridView.cols; index as c">
-                        <g *ngLet="gridView.cellAt(r, c) as cell">
-                            <image
-                                #image
+                        <g
+                            *ngLet="gridView.cellAt(r, c) as cell"
+                            [contextMenu]="contextMenu"
+                            [contextMenuValue]="cell.image"
+                        >
+                            <!-- Outline -->
+                            <rect
                                 [attr.height]="cell.height"
                                 [attr.width]="cell.width"
                                 [attr.x]="cell.x + padding * (c + 1)"
                                 [attr.y]="cell.y + padding * (r + 1)"
                                 [attr.href]="cell.image.data"
-                                [contextMenu]="contextMenu"
-                                [contextMenuValue]="cell.image"
-                            />
+                                stroke="black"
+                                fill="#202020"
+                                stroke-width="padding / 2"
+                            ></rect>
+
+                            <!-- Spinner -->
                             <g *ngIf="cell.image.status === 'LOADING'">
                                 <use
                                     xlink:href="#spinner"
@@ -157,6 +164,16 @@
                                     [attr.y]="pos.y"
                                 />
                             </g>
+
+                            <!-- Image -->
+                            <image
+                                #image
+                                [attr.height]="cell.height"
+                                [attr.width]="cell.width"
+                                [attr.x]="cell.x + padding * (c + 1)"
+                                [attr.y]="cell.y + padding * (r + 1)"
+                                [attr.href]="cell.image.data"
+                            />
                         </g>
                     </g>
                 </g>
@@ -201,12 +218,18 @@
     </div>
 </mat-toolbar>
 
-<context-menu #contextMenu menuClass="context-menu">
+<context-menu
+    #contextMenu
+    menuClass="context-menu"
+    (open)="onCtxMenuOpen(contextMenu)"
+>
     <ng-template contextMenuItem let-value (execute)="onCopyImage($any(null))"
         >Copy image</ng-template
     >
     <ng-template contextMenuItem>Use as base</ng-template>
-    <ng-template contextMenuItem let-value [disabled]="false">Load</ng-template>
+    <ng-template contextMenuItem let-value (execute)="onLoadImage($event)"
+        >Load</ng-template
+    >
 </context-menu>
 
 <style>

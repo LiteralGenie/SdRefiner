@@ -1,7 +1,14 @@
 import { Platform } from '@angular/cdk/platform'
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core'
+import {
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    HostListener,
+    ViewChild,
+} from '@angular/core'
 import { MatSnackBar } from '@angular/material/snack-bar'
 import { Store } from '@ngrx/store'
+import { ContextMenuComponent } from '@perfectmemory/ngx-contextmenu'
 import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
 import { DataService, Image } from 'src/app/services/data.service'
@@ -197,6 +204,23 @@ export class GridViewComponent {
         // Use clipboard api for chrome but itll require https
     }
 
+    onCtxMenuOpen(menu: ContextMenuComponent<any>): void {
+        const image: Image = menu!.value
+        const copyImageOption = menu.menuItems.get(0)
+        const loadOption = menu.menuItems.get(2)
+
+        copyImageOption!.disabled = image.status !== 'LOADED'
+        loadOption!.disabled = image.status !== 'IDLE'
+
+        this.cdr.detectChanges()
+    }
+
+    async onLoadImage($event: any) {
+        const image: Image = $event.value
+        image.load()
+        this.cdr.detectChanges()
+    }
+
     get status$() {
         return this.gridView$.pipe(
             map((gridView) => {
@@ -255,7 +279,8 @@ export class GridViewComponent {
         private store: Store,
         private ds: DataService,
         private snackBar: MatSnackBar,
-        private platform: Platform
+        private platform: Platform,
+        private cdr: ChangeDetectorRef
     ) {}
 }
 
