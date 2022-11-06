@@ -6,6 +6,7 @@ import {
 import { FormArray, FormControl, FormGroup } from '@angular/forms'
 import { MatButton } from '@angular/material/button'
 import { Store } from '@ngrx/store'
+import { SAMPLERS } from '@src/app/services/data.service'
 import { Diff, diffObjects } from '@src/app/utils/compare'
 import {
     combineLatest,
@@ -311,6 +312,10 @@ export class GridSettingsComponent {
         return Object.values(this.formDiff).some(
             (obj) => Object.keys(obj as any).length > 0
         )
+    }
+
+    get SAMPLERS() {
+        return SAMPLERS
     }
 
     trackByAxis(index: number, control: FormControl) {

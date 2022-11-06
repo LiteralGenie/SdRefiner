@@ -101,7 +101,11 @@
 </div>
 
 <mat-toolbar class="flex-row" style="justify-content: space-between">
-    <div class="flex-row" style="font-size: 14px; align-items: center">
+    <!-- Status -->
+    <div
+        class="flex-row"
+        style="font-size: 14px; align-items: center; opacity: 0.69"
+    >
         <ng-container *ngIf="status$ | async as status">
             {{ status.title }}
             <div
@@ -133,18 +137,9 @@
 </mat-toolbar>
 
 <context-menu #contextMenu menuClass="context-menu">
-    <ng-template contextMenuItem [passive]="true">
-        <span class="menu-item-title">Context menu title</span>
-    </ng-template>
-
-    <ng-template contextMenuItem let-value
-        >This is the context menu value "{{ value }}"</ng-template
-    >
-    <ng-template contextMenuItem let-value> Cut {{ value }} </ng-template>
-    <ng-template contextMenuItem let-value [divider]="true"></ng-template>
-    <ng-template contextMenuItem [disabled]="true">
-        Disabled menu item
-    </ng-template>
+    <ng-template contextMenuItem let-value>Copy image</ng-template>
+    <ng-template contextMenuItem>Use as base</ng-template>
+    <ng-template contextMenuItem let-value [disabled]="false">Load</ng-template>
 </context-menu>
 
 <style>

@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store'
 import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
 import { DataService, Image } from 'src/app/services/data.service'
-import { AxisInterface } from '../axis'
 import { selectGrid } from '../store'
 import { Grid } from '../types'
 
@@ -82,6 +81,7 @@ export class GridViewComponent {
 
     ngOnInit() {
         this.grid$.subscribe(this.loadGrid.bind(this))
+        this.gridView$.subscribe(() => this.setZoom(1, 0, 0, 500))
     }
 
     private zoomBehavior = d3.zoom()
@@ -198,7 +198,7 @@ export class GridViewComponent {
                 const numCells = gridView.rows.length * gridView.cols.length
 
                 return {
-                    title: `${gridView.xTitle} vs ${gridView.yTitle}`,
+                    title: `${gridView.yTitle} vs ${gridView.xTitle}`,
                     loaded: `${numLoaded} of ${numCells} loaded`,
                 }
             })
@@ -222,7 +222,8 @@ export class GridViewComponent {
         if (tgt === document.body || tgt.nodeName === 'image') {
             this.setZoom(1, 0, 0, 500)
             ev.preventDefault()
-        } else console.log(ev)
+            console.log(ev)
+        }
     }
 
     constructor(private store: Store, private ds: DataService) {}

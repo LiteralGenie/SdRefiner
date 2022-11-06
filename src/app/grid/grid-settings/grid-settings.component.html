@@ -57,7 +57,7 @@
                         <mat-label>Sampler</mat-label>
                         <mat-select formControlName="sampler">
                             <mat-option
-                                *ngFor="let smplr of ['Euler', 'Euler a']"
+                                *ngFor="let smplr of SAMPLERS"
                                 [value]="smplr"
                             >
                                 {{ smplr }}

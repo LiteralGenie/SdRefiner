@@ -1,17 +1,19 @@
 <mat-drawer-container autosize [style.height.%]="100">
-    <mat-drawer #drawer mode="side" opened>
+    <mat-drawer #drawer mode="side">
         <mat-tab-group mat-align-tabs="start" style="max-height: 100%">
             <mat-tab label="SETTINGS">
                 <app-grid-settings></app-grid-settings>
             </mat-tab>
-            <mat-tab label="FAVORITES">Content 2</mat-tab>
-            <mat-tab label="HISTORY">Content 3</mat-tab>
+            <mat-tab label="FAVORITES">WIP</mat-tab>
+            <mat-tab label="HISTORY">WIP</mat-tab>
         </mat-tab-group>
     </mat-drawer>
 
     <mat-drawer-content style="display: flex; flex-flow: column">
         <mat-toolbar>
-            <button (click)="drawer.toggle()" mat-button>DRAWER</button>
+            <button (click)="drawer.toggle()" mat-icon-button>
+                <i class="las la-bars la-2x"></i>
+            </button>
         </mat-toolbar>
         <div [style.height]="'calc(100% - 64px)'">
             <app-grid-view [style.height.%]="100"></app-grid-view>
