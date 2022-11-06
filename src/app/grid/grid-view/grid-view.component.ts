@@ -226,6 +226,20 @@ export class GridViewComponent {
         }
     }
 
+    getSpinnerPosition(image: HTMLElement): { x: number; y: number } {
+        const attrs = image.attributes
+        const x = parseInt(attrs.getNamedItem('x')!.value)
+        const y = parseInt(attrs.getNamedItem('y')!.value)
+        const width = parseInt(attrs.getNamedItem('width')!.value)
+        const height = parseInt(attrs.getNamedItem('height')!.value)
+
+        const result = {
+            x: x + width / 2,
+            y: y + height / 2,
+        }
+        return result
+    }
+
     constructor(private store: Store, private ds: DataService) {}
 }
 
