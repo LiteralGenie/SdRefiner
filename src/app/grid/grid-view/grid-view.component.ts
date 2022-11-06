@@ -47,7 +47,7 @@ export class GridViewComponent {
                 .map((_, i) => maxHeight(i, images))
                 .map((val) => val)
 
-            const colWidths = images
+            const colWidths = images[0]
                 .map((_, i) => maxWidth(i, images))
                 .map((val) => val)
 
