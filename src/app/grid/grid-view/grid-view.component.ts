@@ -1,4 +1,6 @@
+import { Platform } from '@angular/cdk/platform'
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { Store } from '@ngrx/store'
 import * as d3 from 'd3'
 import { filter, map, Observable, share, shareReplay, tap } from 'rxjs'
@@ -186,6 +188,15 @@ export class GridViewComponent {
         return images
     }
 
+    onCopyImage(image: Image): void {
+        if (this.platform.FIREFOX) {
+            this.snackBar.open('To copy images, try shift + right-click', 'OK')
+        } else {
+            this.snackBar.open(`@TODO`)
+        }
+        // Use clipboard api for chrome but itll require https
+    }
+
     get status$() {
         return this.gridView$.pipe(
             map((gridView) => {
@@ -240,7 +251,12 @@ export class GridViewComponent {
         return result
     }
 
-    constructor(private store: Store, private ds: DataService) {}
+    constructor(
+        private store: Store,
+        private ds: DataService,
+        private snackBar: MatSnackBar,
+        private platform: Platform
+    ) {}
 }
 
 class GridView {

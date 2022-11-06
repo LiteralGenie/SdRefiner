@@ -11,9 +11,9 @@ import { MatDividerModule } from '@angular/material/divider'
 import { MatFormFieldModule } from '@angular/material/form-field'
 import { MatIconModule } from '@angular/material/icon'
 import { MatInputModule } from '@angular/material/input'
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
 import { MatSelectModule } from '@angular/material/select'
 import { MatSidenavModule } from '@angular/material/sidenav'
+import { MatSnackBarModule } from '@angular/material/snack-bar'
 import { MatTabsModule } from '@angular/material/tabs'
 import { MatToolbarModule } from '@angular/material/toolbar'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -27,6 +27,7 @@ import { GridSettingsComponent } from './grid/grid-settings/grid-settings.compon
 import { GridViewComponent } from './grid/grid-view/grid-view.component'
 import { RezInputComponent } from './grid/rez-input/rez-input.component'
 import { gridFormReducer, gridReducer } from './grid/store'
+import { PlatformModule } from '@angular/cdk/platform'
 
 @NgModule({
     declarations: [
@@ -58,7 +59,8 @@ import { gridFormReducer, gridReducer } from './grid/store'
         StoreDevtoolsModule.instrument(),
         ContextMenuModule,
         MatCheckboxModule,
-        MatProgressSpinnerModule,
+        MatSnackBarModule,
+        PlatformModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

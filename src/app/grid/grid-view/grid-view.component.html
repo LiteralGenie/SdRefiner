@@ -147,7 +147,7 @@
                                 [attr.y]="cell.y + padding * (r + 1)"
                                 [attr.href]="cell.image.data"
                                 [contextMenu]="contextMenu"
-                                contextMenuValue="value"
+                                [contextMenuValue]="cell.image"
                             />
                             <g *ngIf="cell.image.status === 'LOADING'">
                                 <use
@@ -202,7 +202,9 @@
 </mat-toolbar>
 
 <context-menu #contextMenu menuClass="context-menu">
-    <ng-template contextMenuItem let-value>Copy image</ng-template>
+    <ng-template contextMenuItem let-value (execute)="onCopyImage($any(null))"
+        >Copy image</ng-template
+    >
     <ng-template contextMenuItem>Use as base</ng-template>
     <ng-template contextMenuItem let-value [disabled]="false">Load</ng-template>
 </context-menu>
