@@ -149,10 +149,10 @@ export class GridViewComponent {
 
                 const realSize = { x: gridWidth * tfm.k, y: gridHeight * tfm.k }
 
-                const minX = -realSize.x * 0.8
-                const maxX = vpWidth * 0.8
-                const minY = -realSize.y * 0.8
-                const maxY = vpHeight * 0.8
+                const minX = -realSize.x * 0.995
+                const maxX = vpWidth * 0.995
+                const minY = -realSize.y * 0.995
+                const maxY = vpHeight * 0.995
 
                 const { x, y } = tfm
 
