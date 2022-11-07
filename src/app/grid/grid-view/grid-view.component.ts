@@ -212,15 +212,25 @@ export class GridViewComponent {
         const image: Image = menu!.value.image
         const copyImageOption = menu.menuItems.get(0)
         const loadOption = menu.menuItems.get(2)
+        const regnerateOption = menu.menuItems.get(3)
 
         copyImageOption!.disabled = image.status !== 'LOADED'
         loadOption!.disabled = image.status !== 'IDLE'
+        regnerateOption!.disabled = image.status !== 'LOADED'
 
         this.cdr.detectChanges()
     }
 
     onLoadImage($event: any) {
         const image: Image = $event.value.image
+        image.loadCached().then(() => image.load())
+        this.cdr.detectChanges()
+    }
+
+    onForceLoadImage($event: any) {
+        const image: Image = $event.value.image
+        image.data = undefined
+        image.status = 'IDLE'
         image.load()
         this.cdr.detectChanges()
     }

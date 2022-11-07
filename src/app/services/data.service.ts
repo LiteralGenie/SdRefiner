@@ -19,7 +19,7 @@ export class DataService {
     constructor(private http: HttpClient) {}
 
     public async getImage(request: ImageParams): Promise<string> {
-        const url = API_URL + '/generate'
+        const url = API_URL + '/generate' + `?cb=${Date.now()}`
         return await firstValueFrom(
             this.http.post<string>(url, { parameters: request })
         )
@@ -28,7 +28,7 @@ export class DataService {
     public async getImageCached(
         imageParams: ImageParams
     ): Promise<string | null> {
-        const url = API_URL + '/generate'
+        const url = API_URL + '/generate' + `?cb=${Date.now()}`
         return await firstValueFrom(
             this.http.post<string | null>(url, {
                 parameters: imageParams,

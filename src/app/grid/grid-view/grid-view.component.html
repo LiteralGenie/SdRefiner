@@ -173,6 +173,7 @@
                             <!-- Image -->
                             <image
                                 #image
+                                *ngIf="cell.image.data"
                                 [attr.height]="cell.height"
                                 [attr.width]="cell.width"
                                 [attr.x]="cell.x + padding * (c + 1)"
@@ -236,6 +237,10 @@
     >
     <ng-template contextMenuItem let-value (execute)="onLoadImage($event)"
         >Load</ng-template
+    >
+
+    <ng-template contextMenuItem let-value (execute)="onForceLoadImage($event)"
+        >Re-generate</ng-template
     >
 </context-menu>
 
