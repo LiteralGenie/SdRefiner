@@ -295,7 +295,7 @@
                             grid-template-columns: 1fr repeat(4, max-content);
                         "
                     >
-                        <ng-container #input [ngSwitch]="axisId">
+                        <ng-container [ngSwitch]="axisId">
                             <mat-form-field
                                 *ngSwitchCase="'prompt'"
                                 appearance="outline"
@@ -395,7 +395,8 @@
                                 onAxisButtonCycle($any(down), 1)
                             "
                             (keydown.shift.tab)="
-                                $event.preventDefault(); input.focus()
+                                $event.preventDefault();
+                                focusPreviousInput(down)
                             "
                             mat-icon-button
                             class="mt-10"
@@ -412,7 +413,7 @@
                                 onAxisButtonCycle($any(up), 1)
                             "
                             (keydown.shift.tab)="
-                                $event.preventDefault(); input.focus()
+                                $event.preventDefault(); focusPreviousInput(up)
                             "
                             tabindex="-1"
                             mat-icon-button
@@ -430,7 +431,7 @@
                                 onAxisButtonCycle($any(add), 1)
                             "
                             (keydown.shift.tab)="
-                                $event.preventDefault(); input.focus()
+                                $event.preventDefault(); focusPreviousInput(add)
                             "
                             tabindex="-1"
                             mat-icon-button
@@ -449,7 +450,8 @@
                             "
                             tabindex="-1"
                             (keydown.shift.tab)="
-                                $event.preventDefault(); input.focus()
+                                $event.preventDefault();
+                                focusPreviousInput(remove)
                             "
                             [disabled]="controlArray.length === 1"
                             mat-icon-button

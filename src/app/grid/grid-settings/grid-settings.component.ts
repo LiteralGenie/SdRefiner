@@ -237,11 +237,12 @@ export class GridSettingsComponent {
 
         while (true) {
             targetIdx += direction
+            targetIdx = (targetIdx + buttons.length) % buttons.length
 
-            if (targetIdx < 0 || targetIdx >= buttons.length) {
-                input.focus()
-                return
-            }
+            // if (targetIdx < 0 || targetIdx >= buttons.length) {
+            //     input.focus()
+            //     return
+            // }
 
             const target = buttons[targetIdx] as HTMLButtonElement
             if (!target.disabled) {
@@ -274,6 +275,15 @@ export class GridSettingsComponent {
         const control = this.gridForm.get('baseParams')!.get(formControlName)
         const val = Math.round(control!.value / 64) * 64
         control!.setValue(val)
+    }
+
+    focusPreviousInput(button: MatButton): void {
+        const buttonEl = button._elementRef.nativeElement as HTMLButtonElement
+        const parentEl = buttonEl.parentElement
+        const inputEl = Array.from(parentEl!.querySelectorAll('input')).slice(
+            -1
+        )[0]
+        inputEl.focus()
     }
 
     ngAfterViewInit() {
