@@ -190,6 +190,8 @@ export class GridViewComponent {
 
             xValues.forEach((xVal) => {
                 const paramsCell = xAxis.mapParams(paramsRow, xVal)
+                if (paramsCell.seed === -1)
+                    paramsCell.seed = Math.trunc(10 ** 9 * Math.random())
                 row.push(new Image(this.ds, paramsCell))
             })
 
