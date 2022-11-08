@@ -2,10 +2,10 @@
     <mat-form-field appearance="outline">
         <mat-label>Width</mat-label>
         <input
-            #input
+            #widthInput
             [ngModel]="width"
-            (ngModelChange)="setWidth($event)"
-            (blur)="onInputBlur(input.value, 'width')"
+            (ngModelChange)="width = $event"
+            (blur)="onInputBlur(widthInput.value, 'width')"
             matInput
             type="number"
             min="0"
@@ -15,10 +15,10 @@
     <mat-form-field appearance="outline">
         <mat-label>Height</mat-label>
         <input
-            #input
+            #heightInput
             [ngModel]="height"
-            (ngModelChange)="setHeight($event)"
-            (blur)="onInputBlur(input.value, 'height')"
+            (ngModelChange)="height = $event"
+            (blur)="onInputBlur(heightInput.value, 'height')"
             matInput
             type="number"
             min="0"

@@ -17,7 +17,7 @@
                 "build": {
                     "builder": "@angular-devkit/build-angular:browser",
                     "options": {
-                        "outputPath": "dist/sd-refiner",
+                        "outputPath": "/media/anne/bottle/projs/python/SdExperiment/src/data/webui/",
                         "index": "src/index.html",
                         "main": "src/main.ts",
                         "polyfills": "src/polyfills.ts",
@@ -28,7 +28,8 @@
                             "./node_modules/@angular/material/prebuilt-themes/pink-bluegrey.css",
                             "src/styles.scss"
                         ],
-                        "scripts": []
+                        "scripts": [],
+                        "deleteOutputPath": false
                     },
                     "configurations": {
                         "production": {

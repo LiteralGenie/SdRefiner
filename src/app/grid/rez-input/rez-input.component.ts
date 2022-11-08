@@ -1,17 +1,10 @@
 import { Component, ElementRef, Input } from '@angular/core'
-import { AbstractControl, NG_VALUE_ACCESSOR } from '@angular/forms'
+import { AbstractControl } from '@angular/forms'
 
 @Component({
     selector: 'app-rez-input',
     templateUrl: './rez-input.component.html',
     styleUrls: ['./rez-input.component.scss'],
-    providers: [
-        {
-            provide: NG_VALUE_ACCESSOR,
-            multi: true,
-            useExisting: RezInputComponent,
-        },
-    ],
 })
 export class RezInputComponent {
     @Input() control?: AbstractControl
@@ -40,27 +33,27 @@ export class RezInputComponent {
         }
     }
 
-    width = -1
-    setWidth(val: number) {
-        this.width = val
-
+    get width() {
+        return this.control?.value[0] || -1
+    }
+    set width(val: number) {
         const controlVal = [...this.control?.value] || [this.width, this.height]
         controlVal[0] = val
         this.control?.setValue(controlVal)
     }
 
-    height = -1
-    setHeight(val: number) {
-        this.height = val
-
+    get height() {
+        return this.control?.value[1] || -1
+    }
+    set height(val: number) {
         const controlVal = [...this.control?.value] || [this.width, this.height]
         controlVal[1] = val
         this.control?.setValue(controlVal)
     }
 
     ngAfterViewInit() {
-        const controlVal = this.control!.value
-        this.setWidth(controlVal[0])
-        this.setHeight(controlVal[1])
+        // const controlVal = this.control!.value
+        // this.width = controlVal[0]
+        // this.setHeight(controlVal[1])
     }
 }
